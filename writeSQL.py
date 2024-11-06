@@ -2,7 +2,7 @@ import pandas as pd
 
 FIRST_SEASON = "2016"
 
-sql_create_tables = """
+SQL_CREATE_TABLES = """
 
 USE cs3380;
 
