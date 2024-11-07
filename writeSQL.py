@@ -1,3 +1,5 @@
+# E stinks
+
 import pandas as pd
 
 FIRST_SEASON = "2016"
