@@ -159,7 +159,7 @@ def create_playsIn_df(valid_game_ids):
   #duplicate playerid and gamid ??
   skater_game = pd.read_csv("../data/game_skater_stats.csv")
 
-  print(skater_game.columns)
+  # print(skater_game.columns)
 
 
   skater_game.rename(columns={"game_id":"gameID", "player_id":"playerID"}, inplace=True)
