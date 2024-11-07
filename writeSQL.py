@@ -197,7 +197,7 @@ def fix_apostrophes(df):
   for i in range(df.shape[1]):
     if((df.iloc[:,i]).dtype == "object"):
 
-      print((df.iloc[:,i]).dtype)
+      # print((df.iloc[:,i]).dtype)
       df.iloc[:,i] = df.iloc[:,i].str.replace("'", "''")
 
 
