@@ -6,9 +6,12 @@ SQL_CREATE_TABLES = """
 
 USE cs3380;
 
+DROP TABLE IF EXISTS playsIn;
 DROP TABLE IF EXISTS games;
 DROP TABLE IF EXISTS venues;
 DROP TABLE IF EXISTS teams; 
+DROP TABLE IF EXISTS skaters;
+DROP TABLE IF EXISTS goalies;
 
 CREATE TABLE teams (
   teamID INT PRIMARY KEY,
@@ -24,7 +27,7 @@ CREATE TABLE venues (
 
 
 CREATE TABLE games (
-  gameID INT NOT NULL,
+  gameID INT PRIMARY KEY,
   type varchar(10) NOT NULL,
   dateTime DATETIME NOT NULL,
   outcome varchar(30) NOT NULL,
@@ -38,6 +41,39 @@ CREATE TABLE games (
     ON DELETE NO ACTION,
   FOREIGN KEY (awayTeamID) REFERENCES teams (teamID)
     ON DELETE NO ACTION
+);
+
+CREATE TABLE skaters (
+  playerID INT PRIMARY KEY,
+  firstName varchar(30) NOT NULL,
+  lastName varchar(30) NOT NULL,
+  nationality varchar(30) NOT NULL,
+  birthDate DATE NOT NULL,
+  height varchar(30) NOT NULL,
+  weight INT NOT NULL,
+);
+
+CREATE TABLE goalies (
+  playerID INT PRIMARY KEY,
+  firstName varchar(30) NOT NULL,
+  lastName varchar(30) NOT NULL,
+  nationality varchar(30) NOT NULL,
+  birthDate DATE NOT NULL,
+  height varchar(30) NOT NULL,
+  weight INT NOT NULL,
+);
+
+CREATE TABLE playsIn (
+  gameID INT,
+  playerID INT,
+  plusMinus INT NOT NULL,
+
+  FOREIGN KEY (gameID) REFERENCES games (gameID)
+    ON DELETE NO ACTION,
+  FOREIGN KEY (playerID) REFERENCES skaters (playerID)
+    ON DELETE NO ACTION,
+  PRIMARY KEY (gameID, playerID)
+
 );
 """
 
@@ -54,6 +90,7 @@ def create_teams_df():
   return teams
 
 def create_venues_df():
+  # Filter out venues for only those in timeframe we use?
   games = pd.read_csv("../data/game.csv")
 
   venues = games[["venue"]].drop_duplicates()
@@ -62,7 +99,8 @@ def create_venues_df():
 
   venues["venueID"] = range(1, len(venues) + 1)
 
-  venues["venueName"] = venues["venueName"].str.replace("'", "''") # two apostrophes is one in a SQL string 
+  fix_apostrophes(venues)
+  # venues["venueName"] = venues["venueName"].str.replace("'", "''") # two apostrophes is one in a SQL string 
   venues["venueName"] = venues["venueName"].str.replace("  ", "")
   
   # 177 unique venues and timezones
@@ -76,6 +114,7 @@ def create_venues_df():
   
 
 def create_games_df(venueID_mapper):
+  # Duplicate games whne inserting??
   games = pd.read_csv("../data/game.csv")
 
   games["venueID"] = games["venue"].map(venueID_mapper)
@@ -85,21 +124,53 @@ def create_games_df(venueID_mapper):
   games["dateTime"] = games["dateTime"].str.replace("T", " ")
   games["dateTime"] = games["dateTime"].str.replace("Z", "")
 
-
+  # filter games only keeping seasons after FIRST SEASON
   games = games.loc[(games["dateTime"].str[:4] >= FIRST_SEASON) & (games["dateTime"].str[5:7] >= "09")]
 
-  print(games.iloc[1])
+  # print(games.iloc[1])
 
   return games
 
-# ---- try
-# BULK INSERT MyTable
-# FROM 'C:\Path\To\Your\File.csv'
-# WITH (
-#     FIELDTERMINATOR = ',', 
-#     ROWTERMINATOR = '\n',
-#     FIRSTROW = 2
-# );
+def create_skaters_and_goalies_df():
+  players = pd.read_csv("../data/player_info.csv")
+
+  players.rename(columns={"player_id":"playerID"}, inplace=True)
+
+  players = players[["playerID", "firstName", "lastName", "nationality", "birthDate", "height", "weight", "primaryPosition"]]
+  # players["height"] = players["height"].str.replace("'", "''")
+  fix_apostrophes(players)
+
+  # removes 8 players with atleast one null values
+  players = players[players.notnull().all(axis=1)]
+  # print(players[players.isnull().any(axis=1)])
+
+  skaters = players.loc[players["primaryPosition"] != "G"]
+  skaters = skaters.drop(columns = ["primaryPosition"])
+
+  goalies = players.loc[players["primaryPosition"] == "G"]
+  goalies = goalies.drop(columns= ["primaryPosition"])
+
+  return skaters, goalies
+
+  
+def create_playsIn_df(valid_game_ids):
+  skater_game = pd.read_csv("../data/game_skater_stats.csv")
+
+  print(skater_game.columns)
+
+
+  skater_game.rename(columns={"game_id":"gameID", "player_id":"playerID"}, inplace=True)
+  skater_game = skater_game[["gameID", "playerID", "plusMinus"]]
+
+  # only have relationships for valid games
+
+  skater_game = skater_game.loc[skater_game["gameID"].isin(valid_game_ids)]
+
+
+  return skater_game
+
+
+
 
 def create_inserts(df, table_name):
 
@@ -121,6 +192,15 @@ def create_inserts(df, table_name):
   return insert_string
 
 
+def fix_apostrophes(df):
+  for i in range(df.shape[1]):
+    if((df.iloc[:,i]).dtype == "object"):
+
+      print((df.iloc[:,i]).dtype)
+      df.iloc[:,i] = df.iloc[:,i].str.replace("'", "''")
+
+
+
 
 def main():
   all_inserts = ""
@@ -134,6 +214,13 @@ def main():
   games = create_games_df(venueID_mapper)
   all_inserts += create_inserts(games, "games")
 
+  skaters, goalies = create_skaters_and_goalies_df()
+  all_inserts += create_inserts(skaters, "skaters")
+  all_inserts += create_inserts(goalies, "goalies")
+
+  playsIn = create_playsIn_df(games["gameID"])
+  all_inserts += create_inserts(playsIn, "playsIn")
+
   with open('populate.sql', 'w') as file:
     file.write(SQL_CREATE_TABLES)
     file.write(all_inserts)
@@ -141,3 +228,13 @@ def main():
   print("\nSQL file created successfully")
 
 main()
+
+
+# ---- try
+# BULK INSERT MyTable
+# FROM 'C:\Path\To\Your\File.csv'
+# WITH (
+#     FIELDTERMINATOR = ',', 
+#     ROWTERMINATOR = '\n',
+#     FIRSTROW = 2
+# );
