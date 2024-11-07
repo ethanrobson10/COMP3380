@@ -44,7 +44,7 @@ CREATE TABLE games (
 # returns pandas df
 def create_teams_df():
 
-  teams = pd.read_csv("data/team_info.csv")
+  teams = pd.read_csv("../data/team_info.csv")
 
   teams.rename(columns={"shortName":"city", "team_id":"teamID"}, inplace=True)
   teams = teams[["teamID", "city", "teamName"]]
@@ -54,7 +54,7 @@ def create_teams_df():
   return teams
 
 def create_venues_df():
-  games = pd.read_csv("data/game.csv")
+  games = pd.read_csv("../data/game.csv")
 
   venues = games[["venue"]].drop_duplicates()
 
@@ -76,7 +76,7 @@ def create_venues_df():
   
 
 def create_games_df(venueID_mapper):
-  games = pd.read_csv("data/game.csv")
+  games = pd.read_csv("../data/game.csv")
 
   games["venueID"] = games["venue"].map(venueID_mapper)
   games.rename(columns={"game_id":"gameID", "date_time_GMT":"dateTime", "home_team_id":"homeTeamID", "away_team_id":"awayTeamID"}, inplace=True)
@@ -135,7 +135,7 @@ def main():
   all_inserts += create_inserts(games, "games")
 
   with open('populate.sql', 'w') as file:
-    file.write(sql_create_tables)
+    file.write(SQL_CREATE_TABLES)
     file.write(all_inserts)
 
   print("\nSQL file created successfully")
