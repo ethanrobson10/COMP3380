@@ -8,6 +8,8 @@ SQL_CREATE_TABLES = """
 
 USE cs3380;
 
+SET NOCOUNT ON;
+
 DROP TABLE IF EXISTS playsIn;
 DROP TABLE IF EXISTS games;
 DROP TABLE IF EXISTS venues;
@@ -147,9 +149,12 @@ def create_skaters_and_goalies_df():
   # players["height"] = players["height"].str.replace("'", "''")
   fix_apostrophes(players)
 
-  # removes 8 players with atleast one null values
+  # fix missing values
+  players.fillna({"weight":players["weight"].mean(), "height":"6'' 1\"", "nationality": "CAN"}, inplace=True)
+
+  # 0 players removed now -- removes 8 players with atleast one null values
   players = players[players.notnull().all(axis=1)]
-  # print(players[players.isnull().any(axis=1)])
+  
 
   skaters = players.loc[players["primaryPosition"] != "G"]
   skaters = skaters.drop(columns = ["primaryPosition"])
