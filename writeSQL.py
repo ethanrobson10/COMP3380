@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-FIRST_SEASON = "2016"
+FIRST_SEASON = "2018"
 
 SQL_CREATE_TABLES = """
 
@@ -116,7 +116,6 @@ def create_venues_df():
   
 
 def create_games_df(venueID_mapper):
-  # Duplicate games whne inserting??
   games = pd.read_csv("../data/game.csv")
 
   games["venueID"] = games["venue"].map(venueID_mapper)
@@ -129,7 +128,13 @@ def create_games_df(venueID_mapper):
   # filter games only keeping seasons after FIRST SEASON
   games = games.loc[(games["dateTime"].str[:4] >= FIRST_SEASON) & (games["dateTime"].str[5:7] >= "09")]
 
-  # print(games.iloc[1])
+  # print(len(games))
+
+  # cuts dataframe in half (each row is duplicated?)
+  games = games.drop_duplicates()
+
+  # print(len(games))
+
 
   return games
 
@@ -156,11 +161,9 @@ def create_skaters_and_goalies_df():
 
   
 def create_playsIn_df(valid_game_ids):
-  #duplicate playerid and gamid ??
   skater_game = pd.read_csv("../data/game_skater_stats.csv")
 
   # print(skater_game.columns)
-
 
   skater_game.rename(columns={"game_id":"gameID", "player_id":"playerID"}, inplace=True)
   skater_game = skater_game[["gameID", "playerID", "plusMinus"]]
@@ -169,6 +172,8 @@ def create_playsIn_df(valid_game_ids):
 
   skater_game = skater_game.loc[skater_game["gameID"].isin(valid_game_ids)]
 
+  # same - cuts data frame in half
+  skater_game = skater_game.drop_duplicates()
 
   return skater_game
 
@@ -194,6 +199,12 @@ def create_inserts(df, table_name):
 
   return insert_string
 
+def create_bulk_insert(df, table_name):
+  df.to_csv(f"{table_name}.csv", index = False)
+  bulk_insert = f"\nBULK INSERT {table_name}\nFROM '{table_name}.csv'\nWITH (FIELDTERMINATOR = ',', ROWTERMINATOR = '\\n', FIRSTROW = 2);"
+
+  return bulk_insert
+
 
 def fix_apostrophes(df):
   for i in range(df.shape[1]):
@@ -207,9 +218,12 @@ def fix_apostrophes(df):
 
 def main():
   all_inserts = ""
+  # bulk_inserts = ""
 
   teams = create_teams_df()
   all_inserts += create_inserts(teams, "teams")
+
+  # bulk_inserts += create_bulk_insert(teams, "teams")
 
   venues, venueID_mapper = create_venues_df()
   all_inserts += create_inserts(venues, "venues")
@@ -227,6 +241,10 @@ def main():
   with open('populate.sql', 'w') as file:
     file.write(SQL_CREATE_TABLES)
     file.write(all_inserts)
+
+  # with open('bulk_inserts.sql', 'w') as file:
+  #   file.write(SQL_CREATE_TABLES)
+  #   file.write(bulk_inserts)
 
   print("\nSQL file created successfully")
 
