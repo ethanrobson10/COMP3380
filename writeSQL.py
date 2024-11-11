@@ -10,12 +10,14 @@ USE cs3380;
 
 SET NOCOUNT ON;
 
+DROP TABLE IF EXISTS officiatedBy;
 DROP TABLE IF EXISTS playsIn;
 DROP TABLE IF EXISTS games;
 DROP TABLE IF EXISTS venues;
 DROP TABLE IF EXISTS teams; 
 DROP TABLE IF EXISTS skaters;
 DROP TABLE IF EXISTS goalies;
+DROP TABLE IF EXISTS officials;
 
 CREATE TABLE teams (
   teamID INT PRIMARY KEY,
@@ -79,6 +81,24 @@ CREATE TABLE playsIn (
   PRIMARY KEY (gameID, playerID)
 
 );
+
+CREATE TABLE officials (
+  officialID INT PRIMARY KEY,
+  officialName varchar(30)
+);
+
+CREATE TABLE officiatedBy (
+  gameID INT,
+  officialID INT,
+  officialType varchar(30),
+
+  FOREIGN KEY (gameID) REFERENCES games (gameID)
+    ON DELETE NO ACTION,
+  FOREIGN KEY (officialID) REFERENCES officials (officialID)
+    ON DELETE NO ACTION,
+  PRIMARY KEY (gameID, officialID)
+);
+
 """
 
 # returns pandas df
@@ -173,8 +193,7 @@ def create_playsIn_df(valid_game_ids):
   skater_game.rename(columns={"game_id":"gameID", "player_id":"playerID"}, inplace=True)
   skater_game = skater_game[["gameID", "playerID", "plusMinus"]]
 
-  # only have relationships for valid games
-
+  # filter df for only games in our time frame
   skater_game = skater_game.loc[skater_game["gameID"].isin(valid_game_ids)]
 
   # same - cuts data frame in half
@@ -182,7 +201,36 @@ def create_playsIn_df(valid_game_ids):
 
   return skater_game
 
+  
+def create_officials_df():
+  officials = pd.read_csv("../data/game_officials.csv")
 
+  officials.rename(columns={"official_name":"officialName"}, inplace=True)
+  officials = officials[["officialName"]].drop_duplicates()
+
+  fix_apostrophes(officials)
+
+  officials["officialID"] = range(1, len(officials) + 1)
+
+  return officials
+
+# note: a couple games of 5 and 6 refs
+def create_officiatedBy_df(officials_df, valid_game_ids):
+  officials_games = pd.read_csv("../data/game_officials.csv")
+
+  officials_games.rename(columns={"game_id": "gameID", "official_name":"officialName", "official_type": "officialType"}, inplace=True)
+  officials_games = officials_games.drop_duplicates()
+
+  fix_apostrophes(officials_games)
+
+  # filter df for only games in our time frame
+  officials_games = officials_games.loc[officials_games["gameID"].isin(valid_game_ids)]
+
+  officials_games = pd.merge(officials_games, officials_df, on="officialName")
+  officials_games = officials_games[["gameID", "officialID", "officialType"]].drop_duplicates()
+
+
+  return officials_games
 
 
 def create_inserts(df, table_name):
@@ -243,6 +291,12 @@ def main():
   playsIn = create_playsIn_df(games["gameID"])
   all_inserts += create_inserts(playsIn, "playsIn")
 
+  officials = create_officials_df()
+  all_inserts += create_inserts(officials, "officials")
+
+  officiatedBy = create_officiatedBy_df(officials, games["gameID"])
+  all_inserts += create_inserts(officiatedBy, "officiatedBy")
+
   with open('populate.sql', 'w') as file:
     file.write(SQL_CREATE_TABLES)
     file.write(all_inserts)
@@ -256,7 +310,7 @@ def main():
 main()
 
 
-# ---- try
+# ---- Says dont have permission to do this
 # BULK INSERT MyTable
 # FROM 'C:\Path\To\Your\File.csv'
 # WITH (
