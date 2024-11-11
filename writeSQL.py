@@ -1,4 +1,4 @@
-# E stinks
+# Luc stinks
 
 import pandas as pd
 
@@ -91,41 +91,6 @@ CREATE TABLE officiatedBy (
 
 """
 
-
-# OLD TABLES
-# CREATE TABLE skaters (
-#   playerID INT PRIMARY KEY,
-#   firstName varchar(30) NOT NULL,
-#   lastName varchar(30) NOT NULL,
-#   nationality varchar(30) NOT NULL,
-#   birthDate DATE NOT NULL,
-#   height varchar(30) NOT NULL,
-#   weight INT NOT NULL,
-# );
-
-# CREATE TABLE goalies (
-#   playerID INT PRIMARY KEY,
-#   firstName varchar(30) NOT NULL,
-#   lastName varchar(30) NOT NULL,
-#   nationality varchar(30) NOT NULL,
-#   birthDate DATE NOT NULL,
-#   height varchar(30) NOT NULL,
-#   weight INT NOT NULL,
-# );
-
-# CREATE TABLE playsIn (
-#   gameID INT,
-#   playerID INT,
-#   plusMinus INT NOT NULL,
-
-#   FOREIGN KEY (gameID) REFERENCES games (gameID)
-#     ON DELETE NO ACTION,
-#   FOREIGN KEY (playerID) REFERENCES skaters (playerID)
-#     ON DELETE NO ACTION,
-#   PRIMARY KEY (gameID, playerID)
-
-# );
-
 # returns pandas df
 def create_teams_df():
 
@@ -160,7 +125,6 @@ def create_venues_df():
 
   return venues, dict_venue_mapper
 
-  
 
 def create_games_df(venueID_mapper):
   games = pd.read_csv("../data/game.csv")
@@ -175,13 +139,8 @@ def create_games_df(venueID_mapper):
   # filter games only keeping seasons after FIRST SEASON
   games = games.loc[(games["dateTime"].str[:4] >= FIRST_SEASON) & (games["dateTime"].str[5:7] >= "09")]
 
-  # print(len(games))
-
   # cuts dataframe in half (each row is duplicated?)
   games = games.drop_duplicates()
-
-  # print(len(games))
-
 
   return games
 
@@ -256,7 +215,6 @@ def create_officiatedBy_df(officials_df, valid_game_ids):
   officials_games = pd.merge(officials_games, officials_df, on="officialName")
   officials_games = officials_games[["gameID", "officialID", "officialType"]].drop_duplicates()
 
-
   return officials_games
 
 
@@ -277,7 +235,6 @@ def create_inserts(df, table_name):
     values = ", ".join(values) # separate each value with comma and space
     individual_inserts.append(f"{insert_string}({values});\n")
 
-
   insert_string = "\n\n" + "".join(individual_inserts) #full insert statement for given table
 
   return insert_string
@@ -297,16 +254,11 @@ def fix_apostrophes(df):
       df.iloc[:,i] = df.iloc[:,i].str.replace("'", "''")
 
 
-
-
 def main():
   all_inserts = ""
-  # bulk_inserts = ""
 
   teams = create_teams_df()
   all_inserts += create_inserts(teams, "teams")
-
-  # bulk_inserts += create_bulk_insert(teams, "teams")
 
   venues, venueID_mapper = create_venues_df()
   all_inserts += create_inserts(venues, "venues")
@@ -316,9 +268,6 @@ def main():
 
   players = create_player_df()
   all_inserts += create_inserts(players, "players")
-  # skaters, goalies = create_skaters_and_goalies_df()
-  # all_inserts += create_inserts(skaters, "skaters")
-  # all_inserts += create_inserts(goalies, "goalies")
 
   playsIn = create_playsIn_df(games["gameID"])
   all_inserts += create_inserts(playsIn, "playsIn")
@@ -332,10 +281,6 @@ def main():
   with open('populate.sql', 'w') as file:
     file.write(SQL_CREATE_TABLES)
     file.write(all_inserts)
-
-  # with open('bulk_inserts.sql', 'w') as file:
-  #   file.write(SQL_CREATE_TABLES)
-  #   file.write(bulk_inserts)
 
   print("\nSQL file created successfully")
 
