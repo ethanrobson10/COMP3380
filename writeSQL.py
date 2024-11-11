@@ -62,7 +62,8 @@ CREATE TABLE players (
 CREATE TABLE playsIn (
   gameID INT,
   playerID INT,
-  plusMinus INT NOT NULL,
+  plusMinus INT,
+  savePercentage FLOAT,
 
   FOREIGN KEY (gameID) REFERENCES games (gameID)
     ON DELETE NO ACTION,
@@ -208,19 +209,24 @@ def create_player_df():
   
 def create_playsIn_df(valid_game_ids):
   skater_game = pd.read_csv("../data/game_skater_stats.csv")
+  goalie_game = pd.read_csv("../data/game_goalie_stats.csv")
 
-  # print(skater_game.columns)
 
   skater_game.rename(columns={"game_id":"gameID", "player_id":"playerID"}, inplace=True)
   skater_game = skater_game[["gameID", "playerID", "plusMinus"]]
 
+  goalie_game.rename(columns={"game_id":"gameID", "player_id":"playerID"}, inplace=True)
+  goalie_game = goalie_game[["gameID", "playerID", "savePercentage"]]
+
+  playsIn = pd.merge(skater_game, goalie_game, how='outer')
+
   # filter df for only games in our time frame
-  skater_game = skater_game.loc[skater_game["gameID"].isin(valid_game_ids)]
+  playsIn = playsIn.loc[playsIn["gameID"].isin(valid_game_ids)]
 
   # same - cuts data frame in half
-  skater_game = skater_game.drop_duplicates()
+  playsIn = playsIn.drop_duplicates()
 
-  return skater_game
+  return playsIn
 
   
 def create_officials_df():
@@ -266,8 +272,11 @@ def create_inserts(df, table_name):
     for val in row[1]:
       values.append(f"'{val}'" if isinstance(val, str) else str(val))
 
+    values = ['NULL' if x == 'nan' else x for x in values] # replace missing values 'nan' with NULL
+
     values = ", ".join(values) # separate each value with comma and space
     individual_inserts.append(f"{insert_string}({values});\n")
+
 
   insert_string = "\n\n" + "".join(individual_inserts) #full insert statement for given table
 
