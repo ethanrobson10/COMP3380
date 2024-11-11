@@ -185,10 +185,9 @@ def create_plays_df(shiftID_mapper):
   # plays["shiftID"] = ["..."].map(shiftID_mapper)
 
   # rename the columns and remove the ones we dont want 
-  plays_noPlayerID.rename(columns={"play_id": "playID", "game_id": "gameID", "shift_id":"shiftID", 
-                          "period": "periodNum"}, inplace=True)
-  plays_noPlayerID = plays_noPlayerID[["playID", "gameID", "shiftID", "periodNum", "periodType",
-                                       "event", "secondaryType", "periodTime"]] 
+  plays_noPlayerID.rename(columns={"play_id": "playID", "game_id": "gameID", "period": "periodNum"}, inplace=True)
+  plays_noPlayerID = plays_noPlayerID[["playID", "gameID", "shiftID", "periodNum", "periodType", "periodTime"
+                                       "event", "secondaryType"]] 
   
   # need to figure out how to keep players where playerType = {"hitter", "shooter", "scorer"}
   plays_playerID.rename(columns={"play_id": "playID", "player_id": "playerID"}, inplace=True)
