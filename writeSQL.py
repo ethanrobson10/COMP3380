@@ -91,6 +91,31 @@ CREATE TABLE officiatedBy (
 
 """
 
+# table I have so far
+playsTable = """
+
+CREATE TABLE plays(
+    playID INT, -- PK
+    playerID INT, -- FK
+    gameID INT, -- FK
+    shiftID INT, -- FK
+    perdiodNum INT,
+    periodType varchar(15),
+    periodTime INT, 
+    event varchar(15),
+         CHECK (event IN ('Shot', 'Goal', 'Hit')),
+    secondaryType varchar(30)
+
+    FOREIGN KEY (playerID) REFERENCES players(playerID)
+        ON DELETE NO ACTION,
+    FOREIGN KEY (gameID) REFERENCES games (gameID)
+        ON DELETE NO ACTION,
+    FOREIGN KEY (shiftID) REFERENCES shifts(shiftID)
+        ON DELETE NO ACTION
+);
+   
+"""
+
 # returns pandas df
 def create_teams_df():
 
@@ -143,6 +168,38 @@ def create_games_df(venueID_mapper):
   games = games.drop_duplicates()
 
   return games
+
+def create_plays_df(shiftID_mapper):
+
+  # read the csv files, theres 4 million of these so we need to 
+  # trim this somehow before running
+  plays_noPlayerID = pd.read_csv("../data/game_plays.csv")
+
+  # Need player ID for the play from this table 
+  plays_playerID = pd.read_csv("../data/game_plays_players.csv") 
+
+  # luc is working on the create_shifts_df with a mapping to the correct shiftID
+  # shiftID is something we created, so we need a mapping to assign the correct shiftID
+  # mapping: (gameID, playerID, periodNum, range(shiftStart, shiftEnd)) --> playID
+  #                           play instance occurs in here ^
+  # plays["shiftID"] = ["..."].map(shiftID_mapper)
+
+  # rename the columns and remove the ones we dont want 
+  plays_noPlayerID.rename(columns={"play_id": "playID", "game_id": "gameID", "shift_id":"shiftID", 
+                          "period": "periodNum"}, inplace=True)
+  plays_noPlayerID = plays_noPlayerID[["playID", "gameID", "shiftID", "periodNum", "periodType",
+                                       "event", "secondaryType", "periodTime"]] 
+  
+  # need to figure out how to keep players where playerType = {"hitter", "shooter", "scorer"}
+  plays_playerID.rename(columns={"play_id": "playID", "player_id": "playerID"}, inplace=True)
+  plays_playerID = plays_playerID[["playID", "playerID"]] 
+
+  # join the two csv files on the playID 
+  plays = pd.merge(plays_noPlayerID, plays_playerID, how="inner", on="playID")
+  plays = plays[["playID", "playerID", "gameID", "shiftID", "periodNum", 
+                 "periodType", "periodTime" "event", "secondaryType"]]
+
+  return plays
 
 def create_player_df():
   players = pd.read_csv("../data/player_info.csv")
