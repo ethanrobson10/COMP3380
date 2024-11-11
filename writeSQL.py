@@ -15,8 +15,7 @@ DROP TABLE IF EXISTS playsIn;
 DROP TABLE IF EXISTS games;
 DROP TABLE IF EXISTS venues;
 DROP TABLE IF EXISTS teams; 
-DROP TABLE IF EXISTS skaters;
-DROP TABLE IF EXISTS goalies;
+DROP TABLE IF EXISTS players;
 DROP TABLE IF EXISTS officials;
 
 CREATE TABLE teams (
@@ -49,7 +48,7 @@ CREATE TABLE games (
     ON DELETE NO ACTION
 );
 
-CREATE TABLE skaters (
+CREATE TABLE players (
   playerID INT PRIMARY KEY,
   firstName varchar(30) NOT NULL,
   lastName varchar(30) NOT NULL,
@@ -57,16 +56,7 @@ CREATE TABLE skaters (
   birthDate DATE NOT NULL,
   height varchar(30) NOT NULL,
   weight INT NOT NULL,
-);
-
-CREATE TABLE goalies (
-  playerID INT PRIMARY KEY,
-  firstName varchar(30) NOT NULL,
-  lastName varchar(30) NOT NULL,
-  nationality varchar(30) NOT NULL,
-  birthDate DATE NOT NULL,
-  height varchar(30) NOT NULL,
-  weight INT NOT NULL,
+  playerType varchar(30)
 );
 
 CREATE TABLE playsIn (
@@ -76,10 +66,9 @@ CREATE TABLE playsIn (
 
   FOREIGN KEY (gameID) REFERENCES games (gameID)
     ON DELETE NO ACTION,
-  FOREIGN KEY (playerID) REFERENCES skaters (playerID)
+  FOREIGN KEY (playerID) REFERENCES players (playerID)
     ON DELETE NO ACTION,
   PRIMARY KEY (gameID, playerID)
-
 );
 
 CREATE TABLE officials (
@@ -100,6 +89,41 @@ CREATE TABLE officiatedBy (
 );
 
 """
+
+
+# OLD TABLES
+# CREATE TABLE skaters (
+#   playerID INT PRIMARY KEY,
+#   firstName varchar(30) NOT NULL,
+#   lastName varchar(30) NOT NULL,
+#   nationality varchar(30) NOT NULL,
+#   birthDate DATE NOT NULL,
+#   height varchar(30) NOT NULL,
+#   weight INT NOT NULL,
+# );
+
+# CREATE TABLE goalies (
+#   playerID INT PRIMARY KEY,
+#   firstName varchar(30) NOT NULL,
+#   lastName varchar(30) NOT NULL,
+#   nationality varchar(30) NOT NULL,
+#   birthDate DATE NOT NULL,
+#   height varchar(30) NOT NULL,
+#   weight INT NOT NULL,
+# );
+
+# CREATE TABLE playsIn (
+#   gameID INT,
+#   playerID INT,
+#   plusMinus INT NOT NULL,
+
+#   FOREIGN KEY (gameID) REFERENCES games (gameID)
+#     ON DELETE NO ACTION,
+#   FOREIGN KEY (playerID) REFERENCES skaters (playerID)
+#     ON DELETE NO ACTION,
+#   PRIMARY KEY (gameID, playerID)
+
+# );
 
 # returns pandas df
 def create_teams_df():
@@ -160,7 +184,7 @@ def create_games_df(venueID_mapper):
 
   return games
 
-def create_skaters_and_goalies_df():
+def create_player_df():
   players = pd.read_csv("../data/player_info.csv")
 
   players.rename(columns={"player_id":"playerID"}, inplace=True)
@@ -174,15 +198,12 @@ def create_skaters_and_goalies_df():
 
   # 0 players removed now -- removes 8 players with atleast one null values
   players = players[players.notnull().all(axis=1)]
+
+  players["playerType"] = players["primaryPosition"].apply(lambda x: "Goalie" if x == "G" else "Skater")
   
+  players = players.drop(columns = ["primaryPosition"])
 
-  skaters = players.loc[players["primaryPosition"] != "G"]
-  skaters = skaters.drop(columns = ["primaryPosition"])
-
-  goalies = players.loc[players["primaryPosition"] == "G"]
-  goalies = goalies.drop(columns= ["primaryPosition"])
-
-  return skaters, goalies
+  return players
 
   
 def create_playsIn_df(valid_game_ids):
@@ -284,9 +305,11 @@ def main():
   games = create_games_df(venueID_mapper)
   all_inserts += create_inserts(games, "games")
 
-  skaters, goalies = create_skaters_and_goalies_df()
-  all_inserts += create_inserts(skaters, "skaters")
-  all_inserts += create_inserts(goalies, "goalies")
+  players = create_player_df()
+  all_inserts += create_inserts(players, "players")
+  # skaters, goalies = create_skaters_and_goalies_df()
+  # all_inserts += create_inserts(skaters, "skaters")
+  # all_inserts += create_inserts(goalies, "goalies")
 
   playsIn = create_playsIn_df(games["gameID"])
   all_inserts += create_inserts(playsIn, "playsIn")
