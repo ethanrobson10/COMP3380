@@ -274,7 +274,7 @@ def create_playsOn_df(games_df):
 
   players_game = pd.merge(players_game, games_df, how="inner")
   
-  playsOn = pd.DataFrame(columns={"teamID", "playerID", "startDate", "endDate"})
+  playsOn = pd.DataFrame(columns=["teamID", "playerID", "startDate", "endDate"])
 
   players = players_game["playerID"].drop_duplicates()
 
