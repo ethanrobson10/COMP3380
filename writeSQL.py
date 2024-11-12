@@ -10,6 +10,7 @@ USE cs3380;
 
 SET NOCOUNT ON;
 
+DROP TABLE IF EXISTS assists;
 DROP TABLE IF EXISTS plays;
 DROP TABLE IF EXISTS shifts;
 DROP TABLE IF EXISTS officiatedBy;
@@ -123,7 +124,7 @@ CREATE TABLE shifts (
 );
 
 CREATE TABLE plays(
-    playID varchar(30), -- create our own playID to make integer
+    playID varchar(30) PRIMARY KEY, -- create our own playID to make integer
     playerID INT, -- FK
     gameID INT, -- FK
     shiftID INT, -- FK
@@ -144,6 +145,17 @@ CREATE TABLE plays(
         ON DELETE NO ACTION,
     FOREIGN KEY (goalieID) REFERENCES players(playerID)
         ON DELETE NO ACTION
+);
+
+CREATE TABLE assists (
+  playID varchar(30), 
+  playerID INT, 
+
+  FOREIGN KEY (playerID) REFERENCES players (playerID)
+    ON DELETE NO ACTION,
+  FOREIGN KEY (playID) REFERENCES plays (playID)
+    ON DELETE NO ACTION,
+  PRIMARY KEY (playID, playerID)
 );
 
 """
@@ -399,7 +411,10 @@ def create_plays_df(shifts_df, valid_game_ids):
   plays_playerID = original_plays_playerID.copy()
   values = ["PenaltyOn", "Scorer", "Shooter"]
 
+
   assists = plays_playerID.loc[plays_playerID["playerType"] == "Assist"]
+  # print(assists)
+  assists = assists[["playID", "playerID"]]
     
   plays_playerID = plays_playerID.loc[plays_playerID["playerType"].isin(values)]
   # plays_playerID = plays_playerID.loc[plays_playerID["gameID"].isin(valid_game_ids)] # not necessary because inner join
@@ -438,14 +453,20 @@ def create_plays_df(shifts_df, valid_game_ids):
   plays["goalieID"] = plays["goalieID"].astype(pd.Int64Dtype())
 
   print(len(plays))
-  plays = plays.drop_duplicates()
+  plays = plays.drop_duplicates(subset='playID', keep='first')
+  # This drops more - look into why??
   print(len(plays))
 
-  convert_column_int(plays, ["playID", "shiftID", "playerID", "gameID", "periodNumber", "periodTime", "goalieID"])
+  assists = assists.loc[assists["playID"].isin(plays["playID"])]
+  assists = assists.drop_duplicates()
+
+  convert_column_int(assists, ["playerID"])
+
+  convert_column_int(plays, ["shiftID", "playerID", "gameID", "periodNumber", "periodTime", "goalieID"])
 
   convert_column_int(small_shifts, ["shiftID", "playerID", "gameID", "periodNumber", "shiftStart", "shiftEnd"])
 
-  return plays, small_shifts
+  return plays, small_shifts, assists
 
 
 def create_inserts(df, table_name):
@@ -467,6 +488,7 @@ def create_inserts(df, table_name):
 
   insert_string = "\n\n" + "".join(individual_inserts) #full insert statement for given table
 
+  insert_string += f"\nPRINT('Table: {table_name} done inserting')\n"
   return insert_string
 
 def create_bulk_insert(df, table_name):
@@ -485,7 +507,7 @@ def fix_apostrophes(df):
 
 def convert_column_int(df, columns):
   for col in columns:
-    print("casting: " + col)
+    # print("casting: " + col)
 
     if(df[col].isnull().any()):
       df[col] = df[col].astype(pd.Int64Dtype())
@@ -498,35 +520,45 @@ def main():
 
   teams = create_teams_df()
   all_inserts += create_inserts(teams, "teams")
+  print("done teams")
 
   venues, venueID_mapper = create_venues_df()
   all_inserts += create_inserts(venues, "venues")
+  print("done venues")
 
   games = create_games_df(venueID_mapper)
   all_inserts += create_inserts(games, "games")
+  print("done games")
 
   players = create_player_df()
   all_inserts += create_inserts(players, "players")
+  print("done players")
 
   playsIn = create_playsIn_df(games["gameID"])
   all_inserts += create_inserts(playsIn, "playsIn")
+  print("done playsIn")
 
   playsOn = create_playsOn_df(games)
   all_inserts += create_inserts(playsOn, "playsOn")
+  print("done playsOn")
 
   officials = create_officials_df()
   all_inserts += create_inserts(officials, "officials")
+  print("done officials")
 
   officiatedBy = create_officiatedBy_df(officials, games["gameID"])
   all_inserts += create_inserts(officiatedBy, "officiatedBy")
+  print("done officiatedBy")
 
   shifts = create_shifts_df(games["gameID"])
   # all_inserts += create_inserts(shifts, "shifts")
+  print("done shifts")
 
-  plays, small_shifts = create_plays_df(shifts, games["gameID"])
+  plays, small_shifts, assists = create_plays_df(shifts, games["gameID"])
   all_inserts += create_inserts(small_shifts, "shifts")
   all_inserts += create_inserts(plays, "plays")
-
+  all_inserts += create_inserts(assists, "assists")
+  print("done plays")
 
   with open('../inserts.sql', 'w') as file:
     file.write(SQL_CREATE_TABLES)
