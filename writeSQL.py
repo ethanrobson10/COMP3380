@@ -10,10 +10,12 @@ USE cs3380;
 
 SET NOCOUNT ON;
 
+DROP TABLE IF EXISTS shifts;
 DROP TABLE IF EXISTS officiatedBy;
 DROP TABLE IF EXISTS playsIn;
 DROP TABLE IF EXISTS games;
 DROP TABLE IF EXISTS venues;
+DROP TABLE IF EXISTS playsOn;
 DROP TABLE IF EXISTS teams; 
 DROP TABLE IF EXISTS players;
 DROP TABLE IF EXISTS officials;
@@ -72,6 +74,20 @@ CREATE TABLE playsIn (
   PRIMARY KEY (gameID, playerID)
 );
 
+CREATE TABLE playsOn (
+  playerID INT,
+  teamID INT,
+  startDate DATE NOT NULL,
+  endDate DATE,
+  --check endDate after startdate?
+
+  FOREIGN KEY (playerID) REFERENCES players (playerID)
+    ON DELETE NO ACTION,
+  FOREIGN KEY (teamID) REFERENCES teams (teamID)
+    ON DELETE NO ACTION,
+  PRIMARY KEY (playerID, teamID, startDate)
+);
+
 CREATE TABLE officials (
   officialID INT PRIMARY KEY,
   officialName varchar(30)
@@ -89,32 +105,41 @@ CREATE TABLE officiatedBy (
   PRIMARY KEY (gameID, officialID)
 );
 
-"""
+CREATE TABLE shifts (
+  shiftID INT PRIMARY KEY,
+  playerID INT,
+  gameID INT,
+  periodNumber INT NOT NULL,
+  shiftStart INT NOT NULL,
+  shiftEnd INT NOT NULL,
 
-# table I have so far
-playsTable = """
-
-CREATE TABLE plays(
-    playID INT, -- PK
-    playerID INT, -- FK
-    gameID INT, -- FK
-    shiftID INT, -- FK
-    perdiodNum INT,
-    periodType varchar(15),
-    periodTime INT, 
-    event varchar(15),
-         CHECK (event IN ('Shot', 'Goal', 'Hit')),
-    secondaryType varchar(30)
-
-    FOREIGN KEY (playerID) REFERENCES players(playerID)
-        ON DELETE NO ACTION,
-    FOREIGN KEY (gameID) REFERENCES games (gameID)
-        ON DELETE NO ACTION,
-    FOREIGN KEY (shiftID) REFERENCES shifts(shiftID)
-        ON DELETE NO ACTION
+  FOREIGN KEY (playerID) REFERENCES players (playerID)
+    ON DELETE NO ACTION,
+  FOREIGN KEY (gameID) REFERENCES games (gameID)
+    ON DELETE NO ACTION
 );
-   
+
 """
+
+# CREATE TABLE plays(
+#     playID INT, -- PK
+#     playerID INT, -- FK
+#     gameID INT, -- FK
+#     shiftID INT, -- FK
+#     perdiodNum INT,
+#     periodType varchar(15),
+#     periodTime INT, 
+#     event varchar(15),
+#          CHECK (event IN ('Shot', 'Goal', 'Penalty')),
+#     secondaryType varchar(30)
+
+#     FOREIGN KEY (playerID) REFERENCES players(playerID)
+#         ON DELETE NO ACTION,
+#     FOREIGN KEY (gameID) REFERENCES games (gameID)
+#         ON DELETE NO ACTION,
+#     FOREIGN KEY (shiftID) REFERENCES shifts(shiftID)
+#         ON DELETE NO ACTION
+# );
 
 # returns pandas df
 def create_teams_df():
@@ -169,12 +194,20 @@ def create_games_df(venueID_mapper):
 
   return games
 
-def create_shifts_df():
+def create_shifts_df(valid_game_ids):
   shifts = pd.read_csv("../data/game_shifts.csv")
+
+  # ------------remove------------ just for testing
+  shifts = shifts.iloc[:1000] 
 
   # Rename columns for consistency
   shifts = shifts.rename(columns={"game_id": "gameID", "player_id": "playerID", "shift_start": "shiftStart", "shift_end": "shiftEnd"})
   shifts = shifts[["gameID", "playerID", "shiftStart", "shiftEnd"]]
+
+  shifts = shifts.loc[shifts["gameID"].isin(valid_game_ids)]
+
+  # drop duplicates
+  shifts = shifts.drop_duplicates()
 
   # Assign unique IDs for each shift
   shifts["shiftID"] = range(1, len(shifts) + 1)
@@ -184,8 +217,8 @@ def create_shifts_df():
 
   # Calculate period number and period-relative shift start
   shifts["periodNumber"] = shifts["shiftStart"] // PERIOD_DURATION + 1
-  shifts["adjustedShiftStart"] = shifts["shiftStart"] % PERIOD_DURATION
-  shifts["adjustedShiftEnd"] = shifts["shiftEnd"] % PERIOD_DURATION
+  shifts["shiftStart"] = shifts["shiftStart"] % PERIOD_DURATION
+  shifts["shiftEnd"] = (shifts["shiftEnd"] % PERIOD_DURATION).astype(int)
 
   # ***Dont need dictionary anymore***
   # Create the dictionary mapper with (gameID, playerID, periodNumber, adjustedShiftStart) as the key
@@ -193,6 +226,7 @@ def create_shifts_df():
   #     zip(shifts["gameID"], shifts["playerID"], shifts["periodNumber"], shifts["adjustedShiftStart"], shifts["adjustedShiftEnd"]),
   #     shifts["shiftID"]
   # ))
+
   return shifts #, dict_shift_mapper
 
 def create_plays_df(shifts_df, valid_game_ids):
@@ -204,8 +238,8 @@ def create_plays_df(shifts_df, valid_game_ids):
   # filter 1) only important types of plays 2) games in timeframe,
   plays_playerID = pd.read_csv("../data/game_plays_players.csv") 
   values = ["PenaltyOn", "Scorer", "Shooter"]
-  plays_playerID = plays_playerID.loc[plays_playerID["gameID"].isin(values)]
-  plays_playerID = plays_playerID.loc[plays_playerID["gameID"].isin(valid_game_ids)]
+  plays_playerID = plays_playerID.loc[plays_playerID["playerType"].isin(values)]
+  plays_playerID = plays_playerID.loc[plays_playerID["gameID"].isin(valid_game_ids)] # not necessary because join with only valid shifts?
 
   # rename the columns and remove the ones we dont want 
   plays_noPlayerID.rename(columns={"play_id": "playID", "game_id": "gameID", "period": "periodNumber", "event":"playType"}, inplace=True)
@@ -273,7 +307,7 @@ def create_playsIn_df(valid_game_ids):
 
   return playsIn
 
-def create_playsOn_df(games):
+def create_playsOn_df(games_df):
   skater_game = pd.read_csv("../data/game_skater_stats.csv")
   goalie_game = pd.read_csv("../data/game_goalie_stats.csv")
 
@@ -284,13 +318,13 @@ def create_playsOn_df(games):
 
   players_game.rename(columns={"game_id":"gameID", "player_id":"playerID", "team_id":"teamID"}, inplace=True)
 
-  players_game = pd.merge(players_game, games, how="inner")
+  players_game = pd.merge(players_game, games_df, how="inner")
   
   playsOn = pd.DataFrame(columns={"teamID", "playerID", "startDate", "endDate"})
 
   players = players_game["playerID"].drop_duplicates()
 
-  print(len(players))
+  # print(len(players))
 
   for player_id in players:
     
@@ -298,9 +332,8 @@ def create_playsOn_df(games):
     this_players_games = this_players_games.sort_values(by="dateTime")
 
     curr_team = this_players_games.iloc[0]["teamID"]
-    prev_team = -1
 
-    new_row = pd.DataFrame({"teamID":[curr_team], "playerID":[player_id], "startDate":[f"{FIRST_SEASON}-09-00"], "endDate":[pd.NA]})
+    new_row = pd.DataFrame({"teamID":[curr_team], "playerID":[player_id], "startDate":[f"{FIRST_SEASON}-09-01"], "endDate":[pd.NA]})
     playsOn = pd.concat([playsOn, new_row], ignore_index=True)
     # playsOn.loc[len(playsOn)] = [curr_team, player_id, f"{FIRST_SEASON}-09-00", pd.NA]
 
@@ -315,9 +348,6 @@ def create_playsOn_df(games):
 
         # print(playsOn.iloc[len(playsOn) - 1])
         # print(playsOn.iloc[len(playsOn) - 2])
-      
-
-      
       
   return playsOn
 
@@ -364,7 +394,7 @@ def create_inserts(df, table_name):
     for val in row[1]:
       values.append(f"'{val}'" if isinstance(val, str) else str(val))
 
-    values = ['NULL' if x == 'nan' else x for x in values] # replace missing values 'nan' with NULL
+    values = ['NULL' if (x == 'nan' or x == '<NA>') else x for x in values] # replace missing values 'nan' with NULL
 
     values = ", ".join(values) # separate each value with comma and space
     individual_inserts.append(f"{insert_string}({values});\n")
@@ -406,11 +436,18 @@ def main():
   playsIn = create_playsIn_df(games["gameID"])
   all_inserts += create_inserts(playsIn, "playsIn")
 
+  playsOn = create_playsOn_df(games)
+  all_inserts += create_inserts(playsOn, "playsOn")
+
   officials = create_officials_df()
   all_inserts += create_inserts(officials, "officials")
 
   officiatedBy = create_officiatedBy_df(officials, games["gameID"])
   all_inserts += create_inserts(officiatedBy, "officiatedBy")
+
+  shifts = create_shifts_df(games["gameID"])
+  all_inserts += create_inserts(shifts, "shifts")
+
 
   with open('populate.sql', 'w') as file:
     file.write(SQL_CREATE_TABLES)
