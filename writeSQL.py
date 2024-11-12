@@ -216,10 +216,13 @@ def create_plays_df(shifts_df, valid_game_ids):
   plays_playerID = plays_playerID[["playID", "playerID"]] 
 
   # join the two csv files on the playID 
-  plays = pd.merge(plays_noPlayerID, plays_playerID, how="inner", on="playID")
+  plays = pd.merge([plays_noPlayerID, plays_playerID], how="inner", on="playID")
   plays = plays[["playID", "playerID", "gameID", "shiftID", "periodNum", 
                  "periodType", "periodTime" "event", "secondaryType"]]
   
+  plays_shifts = pd.merge([plays, shifts_df], how="inner")
+
+  plays = plays_shifts.loc[plays_shifts["periodTime"].between(plays_shifts["adjustedShiftStart"], plays_shifts["adjustedShiftEnd"])]
   # plays = plays_shifts.loc[plays_shifts[‘playTime’].between(plays_shifts[‘shiftStart’], plays_shifts[‘shiftEnd’])]
 
   return plays
