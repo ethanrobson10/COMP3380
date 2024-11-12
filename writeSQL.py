@@ -195,27 +195,23 @@ def create_shifts_df():
   # ))
   return shifts #, dict_shift_mapper
 
-def create_plays_df(shiftID_mapper):
+def create_plays_df(shifts_df, valid_game_ids):
 
-  # read the csv files, theres 4 million of these so we need to 
-  # trim this somehow before running
+  # filter games in timeframe
   plays_noPlayerID = pd.read_csv("../data/game_plays.csv")
+  plays_noPlayerID = plays_noPlayerID.loc[plays_noPlayerID["gameID"].isin(valid_game_ids)]
 
-  # Need player ID for the play from this table 
+  # filter 1) only important types of plays 2) games in timeframe,
   plays_playerID = pd.read_csv("../data/game_plays_players.csv") 
-
-  # luc is working on the create_shifts_df with a mapping to the correct shiftID
-  # shiftID is something we created, so we need a mapping to assign the correct shiftID
-  # mapping: (gameID, playerID, periodNum, range(shiftStart, shiftEnd)) --> playID
-  #                           play instance occurs in here ^
-  # plays["shiftID"] = ["..."].map(shiftID_mapper)
+  values = ["Hitter", "Scorer", "Shooter"]
+  plays_playerID = plays_playerID.loc[plays_playerID["gameID"].isin(values)]
+  plays_playerID = plays_playerID.loc[plays_playerID["gameID"].isin(valid_game_ids)]
 
   # rename the columns and remove the ones we dont want 
   plays_noPlayerID.rename(columns={"play_id": "playID", "game_id": "gameID", "period": "periodNum"}, inplace=True)
   plays_noPlayerID = plays_noPlayerID[["playID", "gameID", "shiftID", "periodNum", "periodType", "periodTime"
                                        "event", "secondaryType"]] 
   
-  # need to figure out how to keep players where playerType = {"hitter", "shooter", "scorer"}
   plays_playerID.rename(columns={"play_id": "playID", "player_id": "playerID"}, inplace=True)
   plays_playerID = plays_playerID[["playID", "playerID"]] 
 
@@ -223,6 +219,8 @@ def create_plays_df(shiftID_mapper):
   plays = pd.merge(plays_noPlayerID, plays_playerID, how="inner", on="playID")
   plays = plays[["playID", "playerID", "gameID", "shiftID", "periodNum", 
                  "periodType", "periodTime" "event", "secondaryType"]]
+  
+  # plays = plays_shifts.loc[plays_shifts[‘playTime’].between(plays_shifts[‘shiftStart’], plays_shifts[‘shiftEnd’])]
 
   return plays
 
