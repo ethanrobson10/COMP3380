@@ -10,6 +10,7 @@ USE cs3380;
 
 SET NOCOUNT ON;
 
+DROP TABLE IF EXISTS plays;
 DROP TABLE IF EXISTS shifts;
 DROP TABLE IF EXISTS officiatedBy;
 DROP TABLE IF EXISTS playsIn;
@@ -119,27 +120,27 @@ CREATE TABLE shifts (
     ON DELETE NO ACTION
 );
 
+CREATE TABLE plays(
+    playID varchar(30), -- create our own playID to make integer
+    playerID INT, -- FK
+    gameID INT, -- FK
+    shiftID INT, -- FK
+    periodNumber INT,
+    periodType varchar(15),
+    periodTime INT, 
+    playType varchar(15),
+         CHECK (playType IN ('Shot', 'Goal', 'Penalty')),
+    secondaryType varchar(30),
+
+    FOREIGN KEY (playerID) REFERENCES players(playerID)
+        ON DELETE NO ACTION,
+    FOREIGN KEY (gameID) REFERENCES games (gameID)
+        ON DELETE NO ACTION,
+    FOREIGN KEY (shiftID) REFERENCES shifts (shiftID)
+        ON DELETE NO ACTION
+);
+
 """
-
-# CREATE TABLE plays(
-#     playID INT, -- PK
-#     playerID INT, -- FK
-#     gameID INT, -- FK
-#     shiftID INT, -- FK
-#     perdiodNum INT,
-#     periodType varchar(15),
-#     periodTime INT, 
-#     event varchar(15),
-#          CHECK (event IN ('Shot', 'Goal', 'Penalty')),
-#     secondaryType varchar(30)
-
-#     FOREIGN KEY (playerID) REFERENCES players(playerID)
-#         ON DELETE NO ACTION,
-#     FOREIGN KEY (gameID) REFERENCES games (gameID)
-#         ON DELETE NO ACTION,
-#     FOREIGN KEY (shiftID) REFERENCES shifts(shiftID)
-#         ON DELETE NO ACTION
-# );
 
 # returns pandas df
 def create_teams_df():
@@ -233,30 +234,32 @@ def create_plays_df(shifts_df, valid_game_ids):
 
   # filter games in timeframe
   plays_noPlayerID = pd.read_csv("../data/game_plays.csv")
+  # rename the columns 
+  plays_noPlayerID.rename(columns={"play_id": "playID", "game_id": "gameID", "period": "periodNumber", "event":"playType"}, inplace=True)
+  valid_plays = ["Shot", "Goal", "Penalty"]
+  plays_noPlayerID = plays_noPlayerID.loc[plays_noPlayerID["playType"].isin(valid_plays)]
   plays_noPlayerID = plays_noPlayerID.loc[plays_noPlayerID["gameID"].isin(valid_game_ids)]
 
   # filter 1) only important types of plays 2) games in timeframe,
   plays_playerID = pd.read_csv("../data/game_plays_players.csv") 
+  plays_playerID.rename(columns={"play_id": "playID", "player_id": "playerID"}, inplace=True)
   values = ["PenaltyOn", "Scorer", "Shooter"]
   plays_playerID = plays_playerID.loc[plays_playerID["playerType"].isin(values)]
-  plays_playerID = plays_playerID.loc[plays_playerID["gameID"].isin(valid_game_ids)] # not necessary because join with only valid shifts?
-
-  # rename the columns and remove the ones we dont want 
-  plays_noPlayerID.rename(columns={"play_id": "playID", "game_id": "gameID", "period": "periodNumber", "event":"playType"}, inplace=True)
-
-  valid_plays = ["Shot", "Goal", "Penalty"]
-  plays_noPlayerID = plays_noPlayerID.loc[plays_noPlayerID["playType"].isin(valid_plays)]
-
-  plays_playerID.rename(columns={"play_id": "playID", "player_id": "playerID"}, inplace=True)
+  # plays_playerID = plays_playerID.loc[plays_playerID["gameID"].isin(valid_game_ids)] # not necessary because inner join
   plays_playerID = plays_playerID[["playID", "playerID"]] 
 
-  # join the two csv files on the playID 
-  plays = pd.merge([plays_noPlayerID, plays_playerID], how="inner", on="playID")
-
   
-  plays_shifts = pd.merge([plays, shifts_df], how="inner", on=["playerID", "gameID", "periodNumber"])
+  # join the two csv files on the playID 
+  plays = pd.merge(plays_noPlayerID, plays_playerID, how="inner", on="playID")
 
-  plays = plays_shifts.loc[plays_shifts["periodTime"].between(plays_shifts["adjustedShiftStart"], plays_shifts["adjustedShiftEnd"])]
+  # print(len(plays))
+  # a lot of duplicates??? 352992 rows before 88248 after
+  plays = plays.drop_duplicates()
+  # print(len(plays))
+
+  plays_shifts = pd.merge(plays, shifts_df, how="inner", on=["playerID", "gameID", "periodNumber"])
+
+  plays = plays_shifts.loc[plays_shifts["periodTime"].between(plays_shifts["shiftStart"], plays_shifts["shiftEnd"])]
   # plays = plays_shifts.loc[plays_shifts[‘playTime’].between(plays_shifts[‘shiftStart’], plays_shifts[‘shiftEnd’])]
 
   plays = plays[["playID", "playerID", "gameID", "periodNumber", 
@@ -447,6 +450,9 @@ def main():
 
   shifts = create_shifts_df(games["gameID"])
   all_inserts += create_inserts(shifts, "shifts")
+
+  plays = create_plays_df(shifts, games["gameID"])
+  all_inserts += create_inserts(plays, "plays")
 
 
   with open('populate.sql', 'w') as file:
