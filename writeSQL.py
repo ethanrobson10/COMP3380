@@ -39,9 +39,11 @@ CREATE TABLE games (
   type varchar(10) NOT NULL,
   dateTime DATETIME NOT NULL,
   outcome varchar(30) NOT NULL,
+  season varchar(15) NOT NULL,
   homeTeamID INT,
   awayTeamID INT,
   venueID INT,
+  
 
   FOREIGN KEY (venueID) REFERENCES venues (venueID)
     ON DELETE NO ACTION,
@@ -128,9 +130,9 @@ CREATE TABLE plays(
     periodNumber INT,
     periodType varchar(15),
     periodTime INT, 
-    playType varchar(15),
+    playType varchar(15), 
          CHECK (playType IN ('Shot', 'Goal', 'Penalty')),
-    secondaryType varchar(30),
+    secondaryType varchar(60), -- long descriptions for penalties
     goalieID INT,
 
     
@@ -186,13 +188,16 @@ def create_games_df(venueID_mapper):
 
   games["venueID"] = games["venue"].map(venueID_mapper)
   games.rename(columns={"game_id":"gameID", "date_time_GMT":"dateTime", "home_team_id":"homeTeamID", "away_team_id":"awayTeamID"}, inplace=True)
-  games = games[["gameID", "type", "dateTime", "outcome", "homeTeamID", "awayTeamID", "venueID"]]
+  games = games[["gameID", "type", "dateTime", "outcome", "season", "homeTeamID", "awayTeamID", "venueID"]]
 
   games["dateTime"] = games["dateTime"].str.replace("T", " ")
   games["dateTime"] = games["dateTime"].str.replace("Z", "")
 
+  games["season"] = games["season"].astype(str)
+  games["season"] = games["season"].str[:4] + "-" + games["season"].str[4:]
+
   # filter games only keeping seasons after FIRST SEASON
-  games = games.loc[(games["dateTime"].str[:4] >= FIRST_SEASON) & (games["dateTime"].str[5:7] >= "09")]
+  games = games.loc[(games["dateTime"].str[:4] > FIRST_SEASON) | ((games["dateTime"].str[:4] == FIRST_SEASON) & (games["dateTime"].str[5:7] >= "09"))]
 
   # cuts dataframe in half (each row is duplicated?)
   games = games.drop_duplicates()
@@ -322,7 +327,7 @@ def create_shifts_df(valid_game_ids):
   shifts = pd.read_csv("../data/game_shifts.csv")
 
   # ------------remove------------ just for testing
-  shifts = shifts.iloc[:1000] 
+  # shifts = shifts.iloc[:1000] 
 
   # Rename columns for consistency
   shifts = shifts.rename(columns={"game_id": "gameID", "player_id": "playerID", "shift_start": "shiftStart", "shift_end": "shiftEnd"})
@@ -332,6 +337,11 @@ def create_shifts_df(valid_game_ids):
 
   # drop duplicates
   shifts = shifts.drop_duplicates()
+
+  #630 shifts with missing endDates removed
+  # print(len(shifts))
+  shifts = shifts.dropna()
+  # print(len(shifts))
 
   # Assign unique IDs for each shift
   shifts["shiftID"] = range(1, len(shifts) + 1)
@@ -368,6 +378,9 @@ def create_plays_df(shifts_df, valid_game_ids):
   original_plays_playerID.rename(columns={"play_id": "playID", "player_id": "playerID"}, inplace=True)
   plays_playerID = original_plays_playerID.copy()
   values = ["PenaltyOn", "Scorer", "Shooter"]
+
+  assists = plays_playerID.loc[plays_playerID["playerType"] == "Assist"]
+    
   plays_playerID = plays_playerID.loc[plays_playerID["playerType"].isin(values)]
   # plays_playerID = plays_playerID.loc[plays_playerID["gameID"].isin(valid_game_ids)] # not necessary because inner join
   plays_playerID = plays_playerID[["playID", "playerID"]] 
@@ -385,12 +398,18 @@ def create_plays_df(shifts_df, valid_game_ids):
   # print(len(plays))
   # a lot of duplicates??? 352992 rows before 88248 after
   plays = plays.drop_duplicates()
-  # print(len(plays))
+  print(len(plays))
 
+  # 4000 plays lost when merged?
   plays_shifts = pd.merge(plays, shifts_df, how="inner", on=["playerID", "gameID", "periodNumber"])
 
   plays = plays_shifts.loc[plays_shifts["periodTime"].between(plays_shifts["shiftStart"], plays_shifts["shiftEnd"])]
   # plays = plays_shifts.loc[plays_shifts[‘playTime’].between(plays_shifts[‘shiftStart’], plays_shifts[‘shiftEnd’])]
+
+  small_shifts = plays[["gameID", "playerID", "shiftID", "periodNumber", "shiftStart", "shiftEnd"]]
+  print(len(small_shifts))
+  small_shifts = small_shifts.drop_duplicates()
+  print(len(small_shifts))
 
   
   plays = plays[["playID", "playerID", "gameID", "shiftID", "periodNumber", 
@@ -398,8 +417,12 @@ def create_plays_df(shifts_df, valid_game_ids):
   
   plays["goalieID"] = plays["goalieID"].astype(pd.Int64Dtype())
 
+  print(len(plays))
+  plays = plays.drop_duplicates()
+  print(len(plays))
+
   
-  return plays
+  return plays, small_shifts
 
 
 def create_inserts(df, table_name):
@@ -466,13 +489,14 @@ def main():
   all_inserts += create_inserts(officiatedBy, "officiatedBy")
 
   shifts = create_shifts_df(games["gameID"])
-  all_inserts += create_inserts(shifts, "shifts")
+  # all_inserts += create_inserts(shifts, "shifts")
 
-  plays = create_plays_df(shifts, games["gameID"])
+  plays, small_shifts = create_plays_df(shifts, games["gameID"])
+  all_inserts += create_inserts(small_shifts, "shifts")
   all_inserts += create_inserts(plays, "plays")
 
 
-  with open('populate.sql', 'w') as file:
+  with open('../populate.sql', 'w') as file:
     file.write(SQL_CREATE_TABLES)
     file.write(all_inserts)
 
