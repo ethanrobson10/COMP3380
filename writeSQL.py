@@ -158,6 +158,8 @@ def create_teams_df():
 
   teams.loc[teams["city"].isin(["NY Rangers", "NY Islanders"]), "city"] = "New York"
 
+  convert_column_int(teams, ["teamID"])
+
   return teams
 
 def create_venues_df():
@@ -179,6 +181,8 @@ def create_venues_df():
   # should we just REMOVE timezones?
 
   dict_venue_mapper = dict(zip(venues["venueName"], venues["venueID"]))
+
+  convert_column_int(venues, ["venueID"])
 
   return venues, dict_venue_mapper
 
@@ -202,6 +206,12 @@ def create_games_df(venueID_mapper):
   # cuts dataframe in half (each row is duplicated?)
   games = games.drop_duplicates()
 
+  # games["venueID"] = games["venueID"].astype(int)  
+
+  games = games.loc[games["type"] != "A"]
+
+  convert_column_int(games, ["gameID", "homeTeamID", "awayTeamID", "venueID"])
+
   return games
 
 
@@ -223,6 +233,8 @@ def create_player_df():
   players["playerType"] = players["primaryPosition"].apply(lambda x: "Goalie" if x == "G" else "Skater")
   
   players = players.drop(columns = ["primaryPosition"])
+
+  convert_column_int(players, ["playerID", "weight"])
 
   return players
 
@@ -246,6 +258,7 @@ def create_playsIn_df(valid_game_ids):
   # same - cuts data frame in half
   playsIn = playsIn.drop_duplicates()
 
+  convert_column_int(playsIn, ["gameID", "playerID", "plusMinus"])
   return playsIn
 
 def create_playsOn_df(games_df):
@@ -289,6 +302,8 @@ def create_playsOn_df(games_df):
 
         # print(playsOn.iloc[len(playsOn) - 1])
         # print(playsOn.iloc[len(playsOn) - 2])
+  
+  convert_column_int(playsOn, ["playerID", "teamID"])
       
   return playsOn
 
@@ -302,6 +317,8 @@ def create_officials_df():
   fix_apostrophes(officials)
 
   officials["officialID"] = range(1, len(officials) + 1)
+
+  convert_column_int(officials, ["officialID"])
 
   return officials
 
@@ -319,6 +336,8 @@ def create_officiatedBy_df(officials_df, valid_game_ids):
 
   officials_games = pd.merge(officials_games, officials_df, on="officialName")
   officials_games = officials_games[["gameID", "officialID", "officialType"]].drop_duplicates()
+
+  convert_column_int(officials_games, ["gameID", "officialID"])
 
   return officials_games
 
@@ -361,6 +380,7 @@ def create_shifts_df(valid_game_ids):
   #     shifts["shiftID"]
   # ))
 
+  convert_column_int(shifts, ["shiftID", "playerID", "gameID", "periodNumber", "shiftStart", "shiftEnd"])
   return shifts #, dict_shift_mapper
 
 def create_plays_df(shifts_df, valid_game_ids):
@@ -421,7 +441,10 @@ def create_plays_df(shifts_df, valid_game_ids):
   plays = plays.drop_duplicates()
   print(len(plays))
 
-  
+  convert_column_int(plays, ["playID", "shiftID", "playerID", "gameID", "periodNumber", "periodTime", "goalieID"])
+
+  convert_column_int(small_shifts, ["shiftID", "playerID", "gameID", "periodNumber", "shiftStart", "shiftEnd"])
+
   return plays, small_shifts
 
 
@@ -460,6 +483,15 @@ def fix_apostrophes(df):
       # print((df.iloc[:,i]).dtype)
       df.iloc[:,i] = df.iloc[:,i].str.replace("'", "''")
 
+def convert_column_int(df, columns):
+  for col in columns:
+    print("casting: " + col)
+
+    if(df[col].isnull().any()):
+      df[col] = df[col].astype(pd.Int64Dtype())
+    else:
+      df[col] = df[col].astype(int)
+
 
 def main():
   all_inserts = ""
@@ -496,7 +528,7 @@ def main():
   all_inserts += create_inserts(plays, "plays")
 
 
-  with open('../populate.sql', 'w') as file:
+  with open('../inserts.sql', 'w') as file:
     file.write(SQL_CREATE_TABLES)
     file.write(all_inserts)
 
