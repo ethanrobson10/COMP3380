@@ -169,6 +169,31 @@ def create_games_df(venueID_mapper):
 
   return games
 
+def create_shifts_df():
+  shifts = pd.read_csv("../data/game_shifts.csv")
+
+  # Rename columns for consistency
+  shifts = shifts.rename(columns={"game_id": "gameID", "player_id": "playerID", "shift_start": "shiftStart", "shift_end": "shiftEnd"})
+  shifts = shifts[["gameID", "playerID", "shiftStart", "shiftEnd"]]
+
+  # Assign unique IDs for each shift
+  shifts["shiftID"] = range(1, len(shifts) + 1)
+  
+  # Define the duration of each period in seconds
+  PERIOD_DURATION = 1200
+
+  # Calculate period number and period-relative shift start
+  shifts["periodNumber"] = shifts["shiftStart"] // PERIOD_DURATION + 1
+  shifts["adjustedShiftStart"] = shifts["shiftStart"] % PERIOD_DURATION
+
+  # Create the dictionary mapper with (gameID, playerID, periodNumber, adjustedShiftStart) as the key
+  dict_shift_mapper = dict(zip(
+      zip(shifts["gameID"], shifts["playerID"], shifts["periodNumber"], shifts["adjustedShiftStart"]),
+      shifts["shiftID"]
+  ))
+
+  return shifts, dict_shift_mapper
+
 def create_plays_df(shiftID_mapper):
 
   # read the csv files, theres 4 million of these so we need to 
