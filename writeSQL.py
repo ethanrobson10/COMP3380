@@ -208,8 +208,8 @@ def create_plays_df(shifts_df, valid_game_ids):
   plays_playerID = plays_playerID.loc[plays_playerID["gameID"].isin(valid_game_ids)]
 
   # rename the columns and remove the ones we dont want 
-  plays_noPlayerID.rename(columns={"play_id": "playID", "game_id": "gameID", "period": "periodNum"}, inplace=True)
-  plays_noPlayerID = plays_noPlayerID[["playID", "gameID", "shiftID", "periodNum", "periodType", "periodTime"
+  plays_noPlayerID.rename(columns={"play_id": "playID", "game_id": "gameID", "period": "periodNumber"}, inplace=True)
+  plays_noPlayerID = plays_noPlayerID[["playID", "gameID", "periodNumber", "periodType", "periodTime"
                                        "event", "secondaryType"]] 
   
   plays_playerID.rename(columns={"play_id": "playID", "player_id": "playerID"}, inplace=True)
@@ -217,10 +217,10 @@ def create_plays_df(shifts_df, valid_game_ids):
 
   # join the two csv files on the playID 
   plays = pd.merge([plays_noPlayerID, plays_playerID], how="inner", on="playID")
-  plays = plays[["playID", "playerID", "gameID", "shiftID", "periodNum", 
+  plays = plays[["playID", "playerID", "gameID", "periodNumber", 
                  "periodType", "periodTime" "event", "secondaryType"]]
   
-  plays_shifts = pd.merge([plays, shifts_df], how="inner")
+  plays_shifts = pd.merge([plays, shifts_df], how="inner", on=["playerID", "gameID", "periodNumber"])
 
   plays = plays_shifts.loc[plays_shifts["periodTime"].between(plays_shifts["adjustedShiftStart"], plays_shifts["adjustedShiftEnd"])]
   # plays = plays_shifts.loc[plays_shifts[‘playTime’].between(plays_shifts[‘shiftStart’], plays_shifts[‘shiftEnd’])]
