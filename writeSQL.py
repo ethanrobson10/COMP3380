@@ -268,6 +268,54 @@ def create_playsIn_df(valid_game_ids):
 
   return playsIn
 
+def create_playsOn_df(games):
+  skater_game = pd.read_csv("../data/game_skater_stats.csv")
+  goalie_game = pd.read_csv("../data/game_goalie_stats.csv")
+
+  skater_game = skater_game[["game_id", "player_id", "team_id"]]
+  goalie_game = goalie_game[["game_id", "player_id", "team_id"]]
+
+  players_game = pd.concat([skater_game, goalie_game], ignore_index=True)
+
+  players_game.rename(columns={"game_id":"gameID", "player_id":"playerID", "team_id":"teamID"}, inplace=True)
+
+  players_game = pd.merge(players_game, games, how="inner")
+  
+  playsOn = pd.DataFrame(columns={"teamID", "playerID", "startDate", "endDate"})
+
+  players = players_game["playerID"].drop_duplicates()
+
+  print(len(players))
+
+  for player_id in players:
+    
+    this_players_games = players_game.loc[players_game["playerID"] == player_id]
+    this_players_games = this_players_games.sort_values(by="dateTime")
+
+    curr_team = this_players_games.iloc[0]["teamID"]
+    prev_team = -1
+
+    new_row = pd.DataFrame({"teamID":[curr_team], "playerID":[player_id], "startDate":[f"{FIRST_SEASON}-09-00"], "endDate":[pd.NA]})
+    playsOn = pd.concat([playsOn, new_row], ignore_index=True)
+    # playsOn.loc[len(playsOn)] = [curr_team, player_id, f"{FIRST_SEASON}-09-00", pd.NA]
+
+    for row in this_players_games.iterrows():
+      if(row[1]["teamID"] != curr_team):
+        curr_team = row[1]["teamID"]
+        new_team_date = row[1]["dateTime"][:10]
+        playsOn.loc[len(playsOn) - 1, "endDate"] = new_team_date
+
+        new_row = pd.DataFrame({"teamID":[curr_team], "playerID":[player_id], "startDate":new_team_date, "endDate":[pd.NA]})
+        playsOn = pd.concat([playsOn, new_row], ignore_index=True)
+
+        # print(playsOn.iloc[len(playsOn) - 1])
+        # print(playsOn.iloc[len(playsOn) - 2])
+      
+
+      
+      
+  return playsOn
+
   
 def create_officials_df():
   officials = pd.read_csv("../data/game_officials.csv")
