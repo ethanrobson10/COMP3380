@@ -185,14 +185,15 @@ def create_shifts_df():
   # Calculate period number and period-relative shift start
   shifts["periodNumber"] = shifts["shiftStart"] // PERIOD_DURATION + 1
   shifts["adjustedShiftStart"] = shifts["shiftStart"] % PERIOD_DURATION
+  shifts["adjustedShiftEnd"] = shifts["shiftEnd"] % PERIOD_DURATION
 
+  # ***Dont need dictionary anymore***
   # Create the dictionary mapper with (gameID, playerID, periodNumber, adjustedShiftStart) as the key
-  dict_shift_mapper = dict(zip(
-      zip(shifts["gameID"], shifts["playerID"], shifts["periodNumber"], shifts["adjustedShiftStart"]),
-      shifts["shiftID"]
-  ))
-
-  return shifts, dict_shift_mapper
+  # dict_shift_mapper = dict(zip(
+  #     zip(shifts["gameID"], shifts["playerID"], shifts["periodNumber"], shifts["adjustedShiftStart"], shifts["adjustedShiftEnd"]),
+  #     shifts["shiftID"]
+  # ))
+  return shifts #, dict_shift_mapper
 
 def create_plays_df(shiftID_mapper):
 
