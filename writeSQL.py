@@ -131,12 +131,16 @@ CREATE TABLE plays(
     playType varchar(15),
          CHECK (playType IN ('Shot', 'Goal', 'Penalty')),
     secondaryType varchar(30),
+    goalieID INT,
 
+    
     FOREIGN KEY (playerID) REFERENCES players(playerID)
         ON DELETE NO ACTION,
     FOREIGN KEY (gameID) REFERENCES games (gameID)
         ON DELETE NO ACTION,
     FOREIGN KEY (shiftID) REFERENCES shifts (shiftID)
+        ON DELETE NO ACTION,
+    FOREIGN KEY (goalieID) REFERENCES players(playerID)
         ON DELETE NO ACTION
 );
 
@@ -195,77 +199,6 @@ def create_games_df(venueID_mapper):
 
   return games
 
-def create_shifts_df(valid_game_ids):
-  shifts = pd.read_csv("../data/game_shifts.csv")
-
-  # ------------remove------------ just for testing
-  shifts = shifts.iloc[:1000] 
-
-  # Rename columns for consistency
-  shifts = shifts.rename(columns={"game_id": "gameID", "player_id": "playerID", "shift_start": "shiftStart", "shift_end": "shiftEnd"})
-  shifts = shifts[["gameID", "playerID", "shiftStart", "shiftEnd"]]
-
-  shifts = shifts.loc[shifts["gameID"].isin(valid_game_ids)]
-
-  # drop duplicates
-  shifts = shifts.drop_duplicates()
-
-  # Assign unique IDs for each shift
-  shifts["shiftID"] = range(1, len(shifts) + 1)
-  
-  # Define the duration of each period in seconds
-  PERIOD_DURATION = 1200
-
-  # Calculate period number and period-relative shift start
-  shifts["periodNumber"] = shifts["shiftStart"] // PERIOD_DURATION + 1
-  shifts["shiftStart"] = shifts["shiftStart"] % PERIOD_DURATION
-  shifts["shiftEnd"] = (shifts["shiftEnd"] % PERIOD_DURATION).astype(int)
-
-  # ***Dont need dictionary anymore***
-  # Create the dictionary mapper with (gameID, playerID, periodNumber, adjustedShiftStart) as the key
-  # dict_shift_mapper = dict(zip(
-  #     zip(shifts["gameID"], shifts["playerID"], shifts["periodNumber"], shifts["adjustedShiftStart"], shifts["adjustedShiftEnd"]),
-  #     shifts["shiftID"]
-  # ))
-
-  return shifts #, dict_shift_mapper
-
-def create_plays_df(shifts_df, valid_game_ids):
-
-  # filter games in timeframe
-  plays_noPlayerID = pd.read_csv("../data/game_plays.csv")
-  # rename the columns 
-  plays_noPlayerID.rename(columns={"play_id": "playID", "game_id": "gameID", "period": "periodNumber", "event":"playType"}, inplace=True)
-  valid_plays = ["Shot", "Goal", "Penalty"]
-  plays_noPlayerID = plays_noPlayerID.loc[plays_noPlayerID["playType"].isin(valid_plays)]
-  plays_noPlayerID = plays_noPlayerID.loc[plays_noPlayerID["gameID"].isin(valid_game_ids)]
-
-  # filter 1) only important types of plays 2) games in timeframe,
-  plays_playerID = pd.read_csv("../data/game_plays_players.csv") 
-  plays_playerID.rename(columns={"play_id": "playID", "player_id": "playerID"}, inplace=True)
-  values = ["PenaltyOn", "Scorer", "Shooter"]
-  plays_playerID = plays_playerID.loc[plays_playerID["playerType"].isin(values)]
-  # plays_playerID = plays_playerID.loc[plays_playerID["gameID"].isin(valid_game_ids)] # not necessary because inner join
-  plays_playerID = plays_playerID[["playID", "playerID"]] 
-
-  
-  # join the two csv files on the playID 
-  plays = pd.merge(plays_noPlayerID, plays_playerID, how="inner", on="playID")
-
-  # print(len(plays))
-  # a lot of duplicates??? 352992 rows before 88248 after
-  plays = plays.drop_duplicates()
-  # print(len(plays))
-
-  plays_shifts = pd.merge(plays, shifts_df, how="inner", on=["playerID", "gameID", "periodNumber"])
-
-  plays = plays_shifts.loc[plays_shifts["periodTime"].between(plays_shifts["shiftStart"], plays_shifts["shiftEnd"])]
-  # plays = plays_shifts.loc[plays_shifts[‘playTime’].between(plays_shifts[‘shiftStart’], plays_shifts[‘shiftEnd’])]
-
-  plays = plays[["playID", "playerID", "gameID", "periodNumber", 
-                 "periodType", "periodTime", "playType", "secondaryType", "shiftID"]]
-  
-  return plays
 
 def create_player_df():
   players = pd.read_csv("../data/player_info.csv")
@@ -383,6 +316,90 @@ def create_officiatedBy_df(officials_df, valid_game_ids):
   officials_games = officials_games[["gameID", "officialID", "officialType"]].drop_duplicates()
 
   return officials_games
+
+
+def create_shifts_df(valid_game_ids):
+  shifts = pd.read_csv("../data/game_shifts.csv")
+
+  # ------------remove------------ just for testing
+  shifts = shifts.iloc[:1000] 
+
+  # Rename columns for consistency
+  shifts = shifts.rename(columns={"game_id": "gameID", "player_id": "playerID", "shift_start": "shiftStart", "shift_end": "shiftEnd"})
+  shifts = shifts[["gameID", "playerID", "shiftStart", "shiftEnd"]]
+
+  shifts = shifts.loc[shifts["gameID"].isin(valid_game_ids)]
+
+  # drop duplicates
+  shifts = shifts.drop_duplicates()
+
+  # Assign unique IDs for each shift
+  shifts["shiftID"] = range(1, len(shifts) + 1)
+  
+  # Define the duration of each period in seconds
+  PERIOD_DURATION = 1200
+
+  # Calculate period number and period-relative shift start
+  shifts["periodNumber"] = shifts["shiftStart"] // PERIOD_DURATION + 1
+  shifts["shiftStart"] = shifts["shiftStart"] % PERIOD_DURATION
+  shifts["shiftEnd"] = (shifts["shiftEnd"] % PERIOD_DURATION).astype(int)
+
+  # ***Dont need dictionary anymore***
+  # Create the dictionary mapper with (gameID, playerID, periodNumber, adjustedShiftStart) as the key
+  # dict_shift_mapper = dict(zip(
+  #     zip(shifts["gameID"], shifts["playerID"], shifts["periodNumber"], shifts["adjustedShiftStart"], shifts["adjustedShiftEnd"]),
+  #     shifts["shiftID"]
+  # ))
+
+  return shifts #, dict_shift_mapper
+
+def create_plays_df(shifts_df, valid_game_ids):
+
+  # filter games in timeframe
+  plays_noPlayerID = pd.read_csv("../data/game_plays.csv")
+  # rename the columns 
+  plays_noPlayerID.rename(columns={"play_id": "playID", "game_id": "gameID", "period": "periodNumber", "event":"playType"}, inplace=True)
+  valid_plays = ["Shot", "Goal", "Penalty"]
+  plays_noPlayerID = plays_noPlayerID.loc[plays_noPlayerID["playType"].isin(valid_plays)]
+  plays_noPlayerID = plays_noPlayerID.loc[plays_noPlayerID["gameID"].isin(valid_game_ids)]
+
+  # filter 1) only important types of plays 2) games in timeframe,
+  original_plays_playerID = pd.read_csv("../data/game_plays_players.csv") 
+  original_plays_playerID.rename(columns={"play_id": "playID", "player_id": "playerID"}, inplace=True)
+  plays_playerID = original_plays_playerID.copy()
+  values = ["PenaltyOn", "Scorer", "Shooter"]
+  plays_playerID = plays_playerID.loc[plays_playerID["playerType"].isin(values)]
+  # plays_playerID = plays_playerID.loc[plays_playerID["gameID"].isin(valid_game_ids)] # not necessary because inner join
+  plays_playerID = plays_playerID[["playID", "playerID"]] 
+
+  # add playerID for goalie that saved the shot (and scored against)
+  plays_goalie_save = original_plays_playerID.loc[original_plays_playerID["playerType"] == "Goalie"]
+  plays_goalie_save.rename(columns={"playerID":"goalieID"}, inplace = True)
+  plays_goalie_save = plays_goalie_save[["playID", "goalieID"]]
+  plays_playerID = pd.merge(plays_playerID, plays_goalie_save, how="left", on="playID")
+  
+
+  # join the two csv files on the playID 
+  plays = pd.merge(plays_noPlayerID, plays_playerID, how="inner", on="playID")
+
+  # print(len(plays))
+  # a lot of duplicates??? 352992 rows before 88248 after
+  plays = plays.drop_duplicates()
+  # print(len(plays))
+
+  plays_shifts = pd.merge(plays, shifts_df, how="inner", on=["playerID", "gameID", "periodNumber"])
+
+  plays = plays_shifts.loc[plays_shifts["periodTime"].between(plays_shifts["shiftStart"], plays_shifts["shiftEnd"])]
+  # plays = plays_shifts.loc[plays_shifts[‘playTime’].between(plays_shifts[‘shiftStart’], plays_shifts[‘shiftEnd’])]
+
+  
+  plays = plays[["playID", "playerID", "gameID", "shiftID", "periodNumber", 
+                 "periodType", "periodTime", "playType", "secondaryType", "goalieID"]]
+  
+  plays["goalieID"] = plays["goalieID"].astype(pd.Int64Dtype())
+
+  
+  return plays
 
 
 def create_inserts(df, table_name):
