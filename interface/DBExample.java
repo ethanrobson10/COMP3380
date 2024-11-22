@@ -15,7 +15,10 @@ public class DBExample {
 	static Connection connection;
 
 	public static void main(String[] args) throws Exception {
-		
+		MyDatabase db = new MyDatabase();
+		runConsole(db);
+
+		System.out.println("Exiting...");
 	}
 
 
@@ -40,18 +43,20 @@ public class DBExample {
 			}
 
 			else if (parts[0].equals("s")) {
-				if (parts.length >= 2)
+				if (parts.length >= 2){
 					//db.nameSearch(arg);
-				else
+				} else {
 					System.out.println("Require an argument for this command");
+				}
 			}
 
 			else if (parts[0].equals("l")) {
 				try {
-					if (parts.length >= 2)
+					if (parts.length >= 2){
 						//db.lookupByID(arg);
-					else
+					} else {
 						System.out.println("Require an argument for this command");
+					}
 				} catch (Exception e) {
 					System.out.println("id must be an integer");
 				}
@@ -59,10 +64,11 @@ public class DBExample {
 
 			else if (parts[0].equals("sell")) {
 				try {
-					if (parts.length >= 2)
+					if (parts.length >= 2) {
 						//db.lookupWhoSells(arg);
-					else
+					} else {
 						System.out.println("Require an argument for this command");
+					}
 				} catch (Exception e) {
 					System.out.println("id must be an integer");
 				}
@@ -70,10 +76,11 @@ public class DBExample {
 
 			else if (parts[0].equals("notsell")) {
 				try {
-					if (parts.length >= 2)
+					if (parts.length >= 2){
 						//db.whoDoesNotSell(arg);
-					else
+					} else {
 						System.out.println("Require an argument for this command");
+					}
 				} catch (Exception e) {
 					System.out.println("id must be an integer");
 				}
@@ -133,7 +140,7 @@ class MyDatabase {
 
 	public MyDatabase() {
 		Properties prop = new Properties();
-		String fileName = "auth.cfg";
+		String fileName = "../../data/auth.cfg";
 		try {
 			FileInputStream configFile = new FileInputStream(fileName);
 			prop.load(configFile);
