@@ -200,6 +200,9 @@ public class DBExample {
 		System.out.println("  ex            |  (For new users) Displays an example of user       |  none             ");
 		System.out.println("                |  inputs to find a player and get their statistics  |                   ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  terms         |  (For new users) Lists the meaning of any          |  none             ");
+		System.out.println("                |  unfamiliar hockey terms in the system             |                   ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  top25         |  Displays the top 25 players determined by your    |  statistic: 'g'=goals, 'a'=assists, 'p'=points, '+'=plus-minus");
 		System.out.println("                |  desired statistic, for a particular season        |  season: regular season to calculate the top player statistics");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
@@ -336,18 +339,21 @@ class MyDatabase {
 			ResultSet rs = pstmt.executeQuery();
 
 			printBoxedText(String.format("Top 25 Players ordered by %s", getStat(statType)));
-			String[] titles = {"First", "Last", "Goals", "Assists", "Points", "Plus Minus"};
-			final int[] SPACINGS = {14, 15, 8, 8, 8};
+			String[] titles = {"Rank", "First", "Last", "Goals", "Assists", "Points", "Plus Minus"};
+			final int[] SPACINGS = {6, 14, 15, 8, 9, 8};
 			printTitles(titles, SPACINGS);
 			printDashes(titles, SPACINGS);
 
 			String[] columns = new String[titles.length];
+			int rank = 1;
 			while(rs.next()){
+				columns[0] = ""+rank;
 				// populate each row before printing it
-				for (int i = 1; i <= titles.length; i++) {
-					columns[i-1] = rs.getString(i);
+				for (int i = 1; i < titles.length; i++) {
+					columns[i] = rs.getString(i);
 				}
 				printTitles(columns, SPACINGS);
+				rank++;
 			}
 
 			rs.close();
