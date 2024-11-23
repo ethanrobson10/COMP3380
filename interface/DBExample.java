@@ -25,7 +25,7 @@ public class DBExample {
 	public static void runConsole(MyDatabase db) {
 
 		Scanner console = new Scanner(System.in);
-		System.out.print("Welcome! Type h for help. ");
+		welcomeMsg();
 		System.out.print("db > ");
 		String line = console.nextLine();
 		String[] parts;
@@ -111,6 +111,45 @@ public class DBExample {
 
 		console.close();
 	}
+
+	private static void welcomeMsg() {
+        hockeyStickEnclosedMsg(5, "Welcome to the NHL Database!");
+
+        String msg = """
+
+                Explore detailed statistics of your favourite players and even referees!
+                The database covers seasons from 2018-2020.
+
+                Type h for help.
+                """;
+        System.out.println(msg);
+    }
+
+	private static void hockeyStickEnclosedMsg(int stickSize, String message) {
+        final int STICK_BLADE_LEN = stickSize;
+        int messagePadding = message.length(); // Account for spaces around the message.
+    
+        // Loop to create the stick blade
+        for (int i = 0; i < STICK_BLADE_LEN; i++) {
+            StringBuilder str = new StringBuilder();
+    
+            // Left hockey stick
+            str.append(" ".repeat(i)).append("\\\\").append(" ".repeat(STICK_BLADE_LEN-i-1));
+    
+            // Message or spaces in the middle
+            if (i == STICK_BLADE_LEN / 2) {
+                str.append(message).append(" ".repeat(STICK_BLADE_LEN-i-1)).append("//");
+            } else if (i == STICK_BLADE_LEN - 1) {
+                str.append("=".repeat(STICK_BLADE_LEN));
+                str.append(" ".repeat(messagePadding-(2*STICK_BLADE_LEN)));
+                str.append("=".repeat(STICK_BLADE_LEN)).append("//");
+            } else {
+                str.append(" ".repeat(messagePadding + STICK_BLADE_LEN-i-1));
+                str.append("//");
+            }
+            System.out.println(str);
+        }
+    }
 
 	private static void printHelp() {
 		System.out.println("Library database");
