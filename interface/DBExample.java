@@ -286,7 +286,72 @@ class MyDatabase {
 	}
 
 	public void top25byStat(String statType, String season){
-		System.out.println("Implement");
+		try {
+
+			String sql = """
+							WITH allGoals AS ( 
+								SELECT playerID, COUNT(*) as numGoals 
+								FROM plays 
+								JOIN games ON plays.gameID = games.gameID 
+								WHERE plays.playType = 'goal' 
+								AND games.season = ?
+								GROUP BY playerID 
+							), 
+							allAssists AS ( 
+								SELECT assists.playerID, COUNT(*) as numAssists 
+								FROM assists 
+								JOIN plays ON assists.playID = plays.playID 
+								JOIN games ON games.gameID = plays.gameID 
+								AND games.season = ?
+								GROUP BY assists.playerID 
+
+							), 
+							totalPlusMinus AS ( 
+								SELECT playsIn.playerID, SUM(playsIn.plusMinus) as plusMinus 
+								FROM playsIn 
+								JOIN games ON games.gameID = playsIn.gameID 
+								WHERE games.season = ?
+								GROUP BY playsIn.playerID 
+							), 
+							totals AS ( 
+								SELECT allGoals.playerID, numGoals, numAssists, (numGoals + numAssists) AS numPoints, plusMinus 
+								FROM allGoals  
+								JOIN allAssists ON allGoals.playerID = allAssists.playerID 
+								JOIN totalPlusMinus ON allGoals.playerID = totalPlusMinus.playerID 
+							) 
+							SELECT TOP 25 players.firstName, players.lastName, numGoals, numAssists, numPoints, plusMinus 
+							FROM totals 
+							JOIN players ON totals.playerID = players.playerID 
+					""";
+			sql += "ORDER BY " + getStatSQL(statType) + " DESC;";
+
+			PreparedStatement pstmt = connection.prepareStatement(sql);
+			
+			for (int i = 1; i <= 3; i++) 
+				pstmt.setString(i, season);
+
+			ResultSet rs = pstmt.executeQuery();
+
+			printBoxedText(String.format("Top 25 Players ordered by %s", getStat(statType)));
+			String[] titles = {"First", "Last", "Goals", "Assists", "Points", "Plus Minus"};
+			final int[] SPACINGS = {14, 15, 8, 8, 8};
+			printTitles(titles, SPACINGS);
+			printDashes(titles, SPACINGS);
+
+			String[] columns = new String[titles.length];
+			while(rs.next()){
+				// populate each row before printing it
+				for (int i = 1; i <= 6; i++) {
+					columns[i-1] = rs.getString(i);
+				}
+				printTitles(columns, SPACINGS);
+			}
+
+			rs.close();
+			pstmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace(System.out);
+		}
 	}
 
 	public void totalGoalsByTeam(String first, String last) {
@@ -346,7 +411,7 @@ class MyDatabase {
 	}
 
 	// box formatting output
-	private static void printBoxedText(String text) {
+	private void printBoxedText(String text) {
         int width = text.length() + 4;
 		System.out.println();
         printBorder(width);
@@ -365,7 +430,7 @@ class MyDatabase {
 	// with COL_SPACES[i] amount indentation between each column.
 	// The only exception is the last title that gets printed, 
 	// since it doesnt need indentation because theres noghting after it
-	private static void printTitles(String[] titles, final int[] COL_SPACES) {
+	private void printTitles(String[] titles, final int[] COL_SPACES) {
 		String title = "";
 		for (int i = 0; i < titles.length; i++) {
 			if (i < titles.length-1)
@@ -378,7 +443,7 @@ class MyDatabase {
 	}
 
 	// same logic as above, but just prints dashes instead
-	private static void printDashes(String[] titles, final int[] COL_SPACES) {
+	private void printDashes(String[] titles, final int[] COL_SPACES) {
 		String title = "";
 		for (int i = 0; i < titles.length; i++) {
 			if (i < titles.length-1)
@@ -389,5 +454,33 @@ class MyDatabase {
 				title += String.format("%s", "-".repeat(titles[i].length()));
 		}
 		System.out.println(title);
+	}
+
+	private String getStat(String line) {
+		if(line.equals("g")){
+			return "Goals";
+		} else if(line.equals("a")){
+			return "Assists";
+		} else if(line.equals("p")){
+			return "Points";
+		} else if(line.equals("+")){
+			return "Plus-Minus";
+		} else {
+			return "unknown";
+		}
+	}
+
+	private String getStatSQL(String line) {
+		if(line.equals("g")){
+			return "numGoals";
+		} else if(line.equals("a")){
+			return "numAssists";
+		} else if(line.equals("p")){
+			return "numPoints";
+		} else if(line.equals("+")){
+			return "plusMinus";
+		} else {
+			return "numPoints"; // shouldnt happen, but resort to points
+		}
 	}
 }
