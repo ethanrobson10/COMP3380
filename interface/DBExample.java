@@ -158,7 +158,7 @@ public class DBExample {
                 Explore detailed statistics of your favourite players and even referees!
                 The database covers seasons from 2018-2020.
 
-                Type h for help.
+                Type h for the help menu.
                 """;
         System.out.println(msg);
     }
@@ -190,19 +190,22 @@ public class DBExample {
     }
 
 	private static void printHelp() {
-		System.out.println("====================================================== HELP MENU ==================================================================");
-		System.out.println("    COMMAND     |        DESCRIPTION                               |        PARAMETERS        ");
-		System.out.println("----------------+--------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  h             |  Displays this menu                              |         none             ");
-		System.out.println("----------------+--------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  q             |  Exits this program                              |         none             ");
-		System.out.println("----------------+--------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  top25         |  Displays the top 25 players determined by your  |  statistic: 'g'=goals, 'a'=assists, 'p'=points, '+'=plus-minus");
-		System.out.println("                |  desired statistic, for a particular season      |  season: regular season to calculate the top player statistics");
-		System.out.println("----------------+--------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  tgbt          |  Displays total goals scored on each team        |  first: first name of the player                              ");	  
-		System.out.println("                |  for a chosen player                             |  last: last name of the player                                ");
-		System.out.println("===================================================================================================================================");
+		System.out.println("====================================================== HELP MENU ====================================================================");
+		System.out.println("    COMMAND     |        DESCRIPTION                                 |        PARAMETERS        ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  h             |  Displays this menu                                |  none             ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  q             |  Exits this program                                |  none             ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  ex            |  (For new users) Displays an example of user       |  none             ");
+		System.out.println("                |  inputs to find a player and get their statistics  |                   ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  top25         |  Displays the top 25 players determined by your    |  statistic: 'g'=goals, 'a'=assists, 'p'=points, '+'=plus-minus");
+		System.out.println("                |  desired statistic, for a particular season        |  season: regular season to calculate the top player statistics");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  tgbt          |  Displays total goals scored on each team          |  first: first name of the player                              ");	  
+		System.out.println("                |  for a chosen player                               |  last: last name of the player                                ");
+		System.out.println("=====================================================================================================================================");
 
 	}
 
