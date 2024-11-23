@@ -1,10 +1,12 @@
-.PHONY := build
 
+build: DBExample.class
 
-CS3380A3Q3.class: DBExample.java 
+DBExample.class: DBExample.java
 	javac DBExample.java
 
-build: DBExample.class 
+run: DBExample.class
+	java -cp .:mssql-jdbc-11.2.0.jre11.jar DBExample
 
-run: build
-	java DBExample
+clean:
+	rm DBExample.class
+	rm MyDatabase.class

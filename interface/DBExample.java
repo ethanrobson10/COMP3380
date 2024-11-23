@@ -38,8 +38,8 @@ public class DBExample {
 
 			if (parts[0].equals("h"))
 				printHelp();
-			else if (parts[0].equals("mp")) {
-				//db.getMostPublishers();
+			else if (parts[0].equals("teams")) {
+				db.allTeams();
 			}
 
 			else if (parts[0].equals("s")) {
@@ -137,6 +137,7 @@ public class DBExample {
 
 class MyDatabase {
 	private Connection connection;
+	private static final int COLUMN_SPACE = 20;
 
 	public MyDatabase() {
 		Properties prop = new Properties();
@@ -177,5 +178,36 @@ class MyDatabase {
 			e.printStackTrace(System.out);
 		}
 
+	}
+
+	public void allTeams() {
+		try {
+			// DOMT NEED publishers table???
+			String sql = """
+				SELECT *
+				FROM teams;
+				""";
+
+			PreparedStatement statement = connection.prepareStatement(sql);
+			ResultSet resultSet = statement.executeQuery();
+
+			System.out.println("All teams: \n");
+
+			String colName1 = "teamID";
+			String colName2 = "city";
+			String colName3 = "teamName";
+
+			System.out.printf("%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s\n", colName1, colName2, colName3);
+			System.out.printf("%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s\n", "-".repeat(colName1.length()), "-".repeat(colName2.length()), "-".repeat(colName2.length()));
+			
+			while (resultSet.next()) {
+				System.out.printf("%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s\n", resultSet.getString("teamID"), resultSet.getString("city"), resultSet.getString("teamName"));
+
+			}
+			resultSet.close();
+			statement.close();
+		} catch (SQLException e) {
+			e.printStackTrace(System.out);
+		}
 	}
 }
