@@ -42,11 +42,11 @@ public class DBExample {
 				db.allTeams();
 			}
 
-			else if (parts[0].equals("s")) {
-				if (parts.length >= 2){
-					//db.nameSearch(arg);
+			else if (parts[0].equals("tg")) { 
+				if (parts.length == 3){
+					db.totalGoalsByTeam(parts[1], parts[2]);
 				} else {
-					System.out.println("Require an argument for this command");
+					System.out.println("Usage: tg <first> <last>");
 				}
 			}
 
@@ -210,4 +210,66 @@ class MyDatabase {
 			e.printStackTrace(System.out);
 		}
 	}
+
+	public void totalGoalsByTeam(String first, String last) {
+		try {
+
+			String sql = """
+						SELECT teamName, COUNT(*) as numGoals  
+						FROM teams  
+						JOIN playsOn ON teams.teamID = playsOn.teamID 
+						JOIN plays ON playsOn.playerID = plays.goalieID 
+						JOIN players ON plays.playerID = players.playerID 
+						WHERE  
+						players.firstName = ?  
+						AND players.lastName = ?  
+						AND playType = 'Goal' 
+						GROUP BY teamName  ORDER BY numGoals DESC; 
+					""";
+
+			PreparedStatement pstmt = connection.prepareStatement(sql);
+			pstmt.setString(1, first);
+			pstmt.setString(2, last);
+
+			ResultSet rs = pstmt.executeQuery();
+
+			if (!rs.next()) {
+				//System.out.printf("\nError: the name %s %s was not found.\n", first, last);
+				printBoxedText(String.format("Error: '%s %s' was not found.", first, last));
+			} else {
+				//System.out.printf("\nGoals scored against each team for: %s %s\n", first, last);
+				printBoxedText(String.format("Goals against each team for %s %s", first, last));
+				System.out.printf("\n%-15s %s\n", "Team Name", "Goals Scored");
+				System.out.printf("%-15s %s\n", "-------------", "------------");
+				do {
+
+					String teamName = rs.getString("teamName");
+					int goalsScored = rs.getInt("numGoals");
+					System.out.printf("%-15s %d\n", teamName, goalsScored);
+
+				} while (rs.next());
+				System.out.println();
+			}
+
+			rs.close();
+			pstmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace(System.out);
+		}
+
+	}
+
+	// box formatting output
+	private static void printBoxedText(String text) {
+        int width = text.length() + 4;
+        printBorder(width);
+        System.out.println("| " + text + " |");
+        printBorder(width);
+    }
+    private static void printBorder(int width) {
+        for (int i = 0; i < width; i++) {
+            System.out.print("-");
+        }
+        System.out.println();
+    }
 }
