@@ -50,16 +50,41 @@ public class DBExample {
 				}
 			}
 
-			else if (parts[0].equals("l")) {
-				try {
-					if (parts.length >= 2){
-						//db.lookupByID(arg);
+			else if (parts[0].equals("top25")) {
+				
+				String statType = "";
+				while(statType.length() == 0){
+					
+					System.out.print("\nEnter desired statistic (g/a/p/+): ");
+					line = console.nextLine();
+					if(line.equals("g")){
+						statType = "g";
+					} else if(line.equals("a")){
+						statType = "a";
+					} else if(line.equals("p")){
+						statType = "p";
+					} else if(line.equals("+")){
+						statType = "+";
 					} else {
-						System.out.println("Require an argument for this command");
+						System.out.println("Sorry Invalid statistic: '" + line + "'");
 					}
-				} catch (Exception e) {
-					System.out.println("id must be an integer");
 				}
+
+				String season = "";
+				while(season.length() == 0){
+					
+					System.out.print("\nSelect a season:\n'1' for 2018-2019\n'2' for 2019-2020\nEnter coresponding number: ");
+					line = console.nextLine();
+					if(line.equals("1")){
+						season = "2018-2019";
+					} else if(line.equals("2")){
+						season = "2018-2019";
+					} else {
+						System.out.println("Sorry '" + line + "' is not a season option\n");
+					}
+				}
+
+				db.top25byStat(statType, season);
 			}
 
 			else if (parts[0].equals("sell")) {
@@ -152,23 +177,18 @@ public class DBExample {
     }
 
 	private static void printHelp() {
-		System.out.println("Library database");
-		System.out.println("Commands:");
-		System.out.println("h - Get help");
-		System.out.println("s <name> - Search for a name");
-		System.out.println("l <id> - Search for a user by id");
-		System.out.println("sell <author id> - Search for a stores that sell books by this id");
-		System.out.println("notread - Books not read by its own author");
-		System.out.println("all - Authors that have read all their own books");
-		System.out.println("notsell <author id>  - list of stores that do not sell this author");
-		System.out.println("mp - Authors with the most publishers");
-		System.out.println("mc - Authors with books in the most cities");
-		System.out.println("mr - Most read book by country");
-		System.out.println("");
+		System.out.println("====================================================== HELP MENU ==================================================================");
+		System.out.println("    COMMAND     |        DESCRIPTION                               |        PARAMETERS        ");
+		System.out.println("----------------+--------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  h             |  Displays this menu                              |         none             ");
+		System.out.println("----------------+--------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  q             |  Exits this program                              |         none             ");
+		System.out.println("----------------+--------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  top25         |  Displays the top 25 players determined by your  |  statistic: 'g'=goals, 'a'=assists, 'p'=points, '+'=plus-minus");
+		System.out.println("                |  desired statistic, for a particular season      |  season: regular season to calculate the top player statistics");
 
-		System.out.println("q - Exit the program");
+		System.out.println("===================================================================================================================================");
 
-		System.out.println("---- end help ----- ");
 	}
 
 
@@ -248,6 +268,10 @@ class MyDatabase {
 		} catch (SQLException e) {
 			e.printStackTrace(System.out);
 		}
+	}
+
+	public void top25byStat(String statType, String season){
+		System.out.println("Implement");
 	}
 
 	public void totalGoalsByTeam(String first, String last) {
