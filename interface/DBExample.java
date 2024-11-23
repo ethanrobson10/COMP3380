@@ -42,12 +42,25 @@ public class DBExample {
 				db.allTeams();
 			}
 
-			else if (parts[0].equals("tg")) { 
-				if (parts.length == 3){
-					db.totalGoalsByTeam(parts[1], parts[2]);
-				} else {
-					System.out.println("Usage: tg <first> <last>");
+			else if (parts[0].equals("tgbt")) { 
+
+				String firstName = "";
+				while(firstName.length() == 0){
+					System.out.print("\nEnter the players first name: ");
+					line = console.nextLine();
+					firstName = line;
 				}
+				
+				String lastName = "";
+				while (lastName.length() == 0) {
+					System.out.print("Enter the players last name: ");
+					line = console.nextLine();
+					lastName = line;
+				}
+
+				db.totalGoalsByTeam(firstName, lastName);
+
+
 			}
 
 			else if (parts[0].equals("top25")) {
@@ -186,7 +199,9 @@ public class DBExample {
 		System.out.println("----------------+--------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  top25         |  Displays the top 25 players determined by your  |  statistic: 'g'=goals, 'a'=assists, 'p'=points, '+'=plus-minus");
 		System.out.println("                |  desired statistic, for a particular season      |  season: regular season to calculate the top player statistics");
-
+		System.out.println("----------------+--------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  tgbt          |  Displays total goals scored on each team        |  first: first name of the player                              ");	  
+		System.out.println("                |  for a chosen player                             |  last: last name of the player                                ");
 		System.out.println("===================================================================================================================================");
 
 	}
@@ -297,20 +312,28 @@ class MyDatabase {
 			ResultSet rs = pstmt.executeQuery();
 
 			if (!rs.next()) {
-				//System.out.printf("\nError: the name %s %s was not found.\n", first, last);
 				printBoxedText(String.format("Error: '%s %s' was not found.", first, last));
 			} else {
-				//System.out.printf("\nGoals scored against each team for: %s %s\n", first, last);
-				printBoxedText(String.format("Goals against each team for %s %s", first, last));
-				System.out.printf("\n%-15s %s\n", "Team Name", "Goals Scored");
-				System.out.printf("%-15s %s\n", "-------------", "------------");
-				do {
 
-					String teamName = rs.getString("teamName");
-					int goalsScored = rs.getInt("numGoals");
-					System.out.printf("%-15s %d\n", teamName, goalsScored);
+				printBoxedText(String.format("Goals against each team for %s %s", first, last));
+				
+				String[] titles = {"Team Name", "Goals Scored"};
+				final int[] SPACINGS = {15}; // SPACINGS[[i] is width of i'th column
+				printTitles(titles, SPACINGS);
+				printDashes(titles, SPACINGS);
+				
+				int totalGoals = 0;
+				do {
+					String[] columns = {rs.getString("teamName"), rs.getString("numGoals")};
+					printTitles(columns, SPACINGS);
+					totalGoals += rs.getInt("numGoals");
 
 				} while (rs.next());
+				
+				// Also display total goals after printing ?
+				printDashes(titles, SPACINGS);
+				String[] totals = {"Total:", ""+totalGoals};
+				printTitles(totals, SPACINGS);
 				System.out.println();
 			}
 
@@ -325,9 +348,11 @@ class MyDatabase {
 	// box formatting output
 	private static void printBoxedText(String text) {
         int width = text.length() + 4;
+		System.out.println();
         printBorder(width);
         System.out.println("| " + text + " |");
         printBorder(width);
+		System.out.println();
     }
     private static void printBorder(int width) {
         for (int i = 0; i < width; i++) {
@@ -335,4 +360,34 @@ class MyDatabase {
         }
         System.out.println();
     }
+
+	// prints each string from titles[i] (in that order) as a formatted row
+	// with COL_SPACES[i] amount indentation between each column.
+	// The only exception is the last title that gets printed, 
+	// since it doesnt need indentation because theres noghting after it
+	private static void printTitles(String[] titles, final int[] COL_SPACES) {
+		String title = "";
+		for (int i = 0; i < titles.length; i++) {
+			if (i < titles.length-1)
+				title += String.format("%-" + COL_SPACES[i] + "s", titles[i]);
+			else 	
+				// last output doesnt need indentation
+				title += String.format("%s", titles[i]);
+		}
+		System.out.println(title);
+	}
+
+	// same logic as above, but just prints dashes instead
+	private static void printDashes(String[] titles, final int[] COL_SPACES) {
+		String title = "";
+		for (int i = 0; i < titles.length; i++) {
+			if (i < titles.length-1)
+				// make the indent go as long as the specified width of: COL_SPACES[i]-2
+				title += String.format("%-" + COL_SPACES[i] + "s", "-".repeat(COL_SPACES[i]-2));
+			else 	
+				// make this indent go as long as the length of the column name itself
+				title += String.format("%s", "-".repeat(titles[i].length()));
+		}
+		System.out.println(title);
+	}
 }
