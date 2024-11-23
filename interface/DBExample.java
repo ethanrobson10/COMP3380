@@ -341,7 +341,7 @@ class MyDatabase {
 			String[] columns = new String[titles.length];
 			while(rs.next()){
 				// populate each row before printing it
-				for (int i = 1; i <= 6; i++) {
+				for (int i = 1; i <= titles.length; i++) {
 					columns[i-1] = rs.getString(i);
 				}
 				printTitles(columns, SPACINGS);
