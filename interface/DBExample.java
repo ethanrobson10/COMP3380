@@ -290,28 +290,38 @@ class MyDatabase {
 
 	public void allTeams() {
 		try {
-			// DOMT NEED publishers table???
+			
 			String sql = """
-				SELECT *
+				SELECT teamID, city, teamName
 				FROM teams;
 				""";
 
 			PreparedStatement statement = connection.prepareStatement(sql);
 			ResultSet resultSet = statement.executeQuery();
 
-			System.out.println("All teams: \n");
+			//System.out.println("All teams: \n");
+			printBoxedText("All NHL Teams");
 
-			String colName1 = "teamID";
-			String colName2 = "city";
-			String colName3 = "teamName";
+			String[]  titles = {"ID", "City", "Team Name"};
+			final int[] SPACINGS = {6, 15};
+			printTitles(titles, SPACINGS);
+			printDashes(titles, SPACINGS);
 
-			System.out.printf("%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s\n", colName1, colName2, colName3);
-			System.out.printf("%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s\n", "-".repeat(colName1.length()), "-".repeat(colName2.length()), "-".repeat(colName2.length()));
-			
+			// String colName1 = "teamID";
+			// String colName2 = "city";
+			// String colName3 = "teamName";
+
+			//System.out.printf("%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s\n", colName1, colName2, colName3);
+			//System.out.printf("%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s\n", "-".repeat(colName1.length()), "-".repeat(colName2.length()), "-".repeat(colName2.length()));
+			String[] columns = new String[titles.length];
 			while (resultSet.next()) {
-				System.out.printf("%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s\n", resultSet.getString("teamID"), resultSet.getString("city"), resultSet.getString("teamName"));
-
+				for (int i = 1; i <= columns.length; i++) {
+					columns[i-1] = resultSet.getString(i);
+				}
+				printTitles(columns, SPACINGS);
+				//System.out.printf("%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s%-" + COLUMN_SPACE + "s\n", resultSet.getString("teamID"), resultSet.getString("city"), resultSet.getString("teamName"));
 			}
+
 			resultSet.close();
 			statement.close();
 		} catch (SQLException e) {
@@ -429,7 +439,6 @@ class MyDatabase {
 					String[] columns = {rs.getString("teamName"), rs.getString("numGoals")};
 					printTitles(columns, SPACINGS);
 					totalGoals += rs.getInt("numGoals");
-
 				} while (rs.next());
 				
 				// Also display total goals after printing ?
