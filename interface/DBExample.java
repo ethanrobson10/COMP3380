@@ -40,6 +40,8 @@ public class DBExample {
 				printHelp();
 			else if (parts[0].equals("teams")) {
 				db.allTeams();
+			} else if(parts[0].equals("terms")) {
+				printTerms();
 			}
 
 			else if (parts[0].equals("tgbt")) { 
@@ -210,6 +212,32 @@ public class DBExample {
 		System.out.println("                |  for a chosen player                               |  last: last name of the player                                ");
 		System.out.println("=====================================================================================================================================");
 
+	}
+
+	public static void printTerms() {
+		System.out.println("=========== TERMINOLOGY ====================================================================");
+        System.out.println("      TERM      |        DEFINITION                                                        ");
+        System.out.println("----------------+---------------------------------------------------------------------------");
+        System.out.println("  goal          | awarded to a player who scores on the opposing team's goalie           ");
+        System.out.println("----------------+---------------------------------------------------------------------------");
+        System.out.println("  assist        | awarded to the player or players (maximum two) who touch the puck       ");
+        System.out.println("                | prior to the goal scorer, provided no defender plays or possesses       ");
+        System.out.println("                | the puck in between                                                    ");
+        System.out.println("----------------+---------------------------------------------------------------------------");
+        System.out.println("  point         | a goal or an assist                                                    ");
+        System.out.println("----------------+---------------------------------------------------------------------------");
+        System.out.println("  penalty       | when a player violates the rules of a game and as a result sits in      ");
+        System.out.println("                | the penalty box for an amount of time determined by the referee,        ");
+        System.out.println("                | typically 2 or 5 minutes                                               ");
+        System.out.println("----------------+---------------------------------------------------------------------------");
+        System.out.println("  shift         | refers to an instance when a player is on the ice without going back    ");
+        System.out.println("                | to their team's bench for rest                                         ");
+        System.out.println("----------------+---------------------------------------------------------------------------");
+        System.out.println("  period        | a hockey game is broken into 3 periods, each being 20 minutes.          ");
+        System.out.println("----------------+---------------------------------------------------------------------------");
+        System.out.println("  overtime      | when a hockey game extends the number of periods to 4 or more as a      ");
+        System.out.println("                | result of a tie at the end of the 3rd                                  ");
+        System.out.println("===========================================================================================");
 	}
 
 
