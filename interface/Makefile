@@ -9,4 +9,4 @@ run: DBExample.class
 
 clean:
 	rm DBExample.class
-	rm MyDatabase.class
+	rm HockeyDB.class
