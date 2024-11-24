@@ -262,7 +262,7 @@ public class DBExample {
 			try {
 				n = Integer.parseInt(line);
 				if(n < 1) {
-					System.out.println("Sorry, Integer must be 1 or greater");
+					System.out.println("Sorry, integer must be 1 or greater");
 				}
 			} catch(NumberFormatException nfe) {
 				System.out.println("Sorry, '" + n + "' is not a valid integer");

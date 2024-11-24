@@ -404,7 +404,7 @@ public class HockeyDB {
 
             printBoxedText(String.format("Top %d officials who call the most penalites against away teams", numRows));
             String[] titles = { "Rank", "Name", "Penalties Called" };
-            final int[] SPACINGS = { 6, 20, 16 };
+            final int[] SPACINGS = { 6, 22, 16 };
             printTitles(titles, SPACINGS);
             printDashes(titles, SPACINGS);
 
@@ -570,7 +570,7 @@ public class HockeyDB {
 
             rs.close();
             pstmt.close();
-            
+
         } catch (SQLException e) {
             e.printStackTrace(System.out);
         }
