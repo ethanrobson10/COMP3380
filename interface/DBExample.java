@@ -82,8 +82,22 @@ public class DBExample {
 				db.goalsByVenue(season);
 			}
 
-			else if (parts[0].equals("notread")) {
+			else if (parts[0].equals("topNO")) { //Top N Officials
 				//db.ownBooks();
+				int n = 0; 
+				while(n <= 0) {
+					System.out.print("\nnumRows: ");
+					line = console.nextLine();
+					try {
+						n = Integer.parseInt(line);
+						if(n < 1) {
+							System.out.println("Sorry please enter an integer 1 or greater");
+						}
+					} catch(NumberFormatException nfe) {
+						System.out.println("Sorry please enter an integer 1 or greater");
+					}
+				}
+				db.topNOfficialPenalties(n);
 			}
 
 			else if (parts[0].equals("all")) {
@@ -171,6 +185,9 @@ public class DBExample {
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  tgap          |  Displays a players goals, assists, and            |  first: first name of the player                              ");	  
 		System.out.println("                |  total points from each season                     |  last: last name of the player                                ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  topNO         |  Displays the top numRows officials that call      |  numRows: the number of officials to display                        ");	  
+		System.out.println("                |  the most penalties against away teams             |                                ");
 		System.out.println("=====================================================================================================================================");
 
 	}

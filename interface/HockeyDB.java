@@ -15,7 +15,7 @@ import java.util.Properties;
  * (2) total goals, assists, points for player
  * (3) avg shift length before the player scores, gets shot, or penalty
  * (4) total goals score at all venues
- * 
+ * (5) top N officials calling most penalties against away teams
  * 
  * 
  * (11) top25 by goals/assists/points/plusMinus
@@ -330,44 +330,99 @@ public class HockeyDB {
 
     }
 
-        // (4)
-        public void goalsByVenue(String season) {
-            try {
-    
-                String sql = """
-                        SELECT venues.venueName, COUNT(*) as numGoals 
+    // (4)
+    public void goalsByVenue(String season) {
+        try {
+
+            String sql = """
+                    SELECT venues.venueName, COUNT(*) as numGoals 
+                    FROM plays  
+                    JOIN games ON plays.gameID = games.gameID 
+                    JOIN venues ON games.venueID = venues.venueID 
+                    WHERE games.season = ? AND plays.playType = 'Goal' 
+                    GROUP BY venues.venueID, venues.venueName 
+                    ORDER BY numGoals DESC;
+                """;
+
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            pstmt.setString(1, season);
+            ResultSet rs = pstmt.executeQuery();
+
+            printBoxedText(String.format("Total goals scored at each venue for the year %s", season));
+            String[] titles = { "Venue Name", "Total Goals" };
+            final int[] SPACINGS = { 28 };
+            printTitles(titles, SPACINGS);
+            printDashes(titles, SPACINGS);
+
+            String[] columns = new String[titles.length];
+            while (rs.next()) {
+                columns[0] = rs.getString("venueName");
+                columns[1] = rs.getString("numGoals");
+                printTitles(columns, SPACINGS);
+            }
+
+            rs.close();
+            pstmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace(System.out);
+        }
+
+    }
+
+    // (5)
+    public void topNOfficialPenalties(int numRows) {
+        try {
+
+            String sql = """
+                    WITH allAwayTeamPenalties AS ( 
+                        SELECT plays.gameID 
                         FROM plays  
                         JOIN games ON plays.gameID = games.gameID 
-                        JOIN venues ON games.venueID = venues.venueID 
-                        WHERE games.season = ? AND plays.playType = 'Goal' 
-                        GROUP BY venues.venueID, venues.venueName 
-                        ORDER BY numGoals DESC;
-                    """;
-    
-                PreparedStatement pstmt = connection.prepareStatement(sql);
-                pstmt.setString(1, season);
-                ResultSet rs = pstmt.executeQuery();
-    
-                printBoxedText(String.format("Total goals scored at each venue for the year %s", season));
-                String[] titles = { "Venue Name", "Total Goals" };
-                final int[] SPACINGS = { 28 };
-                printTitles(titles, SPACINGS);
-                printDashes(titles, SPACINGS);
-    
-                String[] columns = new String[titles.length];
-                while (rs.next()) {
-                    columns[0] = rs.getString("venueName");
-                    columns[1] = rs.getString("numGoals");
-                    printTitles(columns, SPACINGS);
+                        JOIN playsOn ON plays.playerID = playson.playerID 
+                        WHERE plays.playType = 'Penalty' 
+                        AND playsOn.teamID = games.awayteamID 
+                    ) 
+
+                    SELECT officials.officialName, COUNT(*) AS numPenalties 
+                    FROM officiatedby 
+                    JOIN officials ON officiatedBy.officialID = officials.officialID 
+                    JOIN allAwayTeamPenalties ON allAwayTeamPenalties.gameID = officiatedBy.gameID 
+                    WHERE officiatedBy.officialType = 'Referee' 
+                    GROUP BY officials.officialID, officials.officialName 
+                    ORDER BY numPenalties DESC; 
+                """;
+
+            
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            // pstmt.setInt(1, numRows); // Doesn't allow a placeholder parameter next to top see FIX below
+
+            ResultSet rs = pstmt.executeQuery();
+
+            printBoxedText(String.format("Top %d officials who call the most penalites against away teams", numRows));
+            String[] titles = { "Rank", "Name", "Penalties Called" };
+            final int[] SPACINGS = { 6, 20, 16 };
+            printTitles(titles, SPACINGS);
+            printDashes(titles, SPACINGS);
+
+            String[] columns = new String[titles.length];
+            int rank = 1;
+            while (rs.next() && rank <= numRows) { //FIX: print until rank equals desired numRows
+                columns[0] = "" + rank;
+                // populate each row before printing it
+                for (int i = 1; i < titles.length; i++) {
+                    columns[i] = rs.getString(i);
                 }
-    
-                rs.close();
-                pstmt.close();
-            } catch (SQLException e) {
-                e.printStackTrace(System.out);
+                printTitles(columns, SPACINGS);
+                rank++;
             }
-    
+
+            rs.close();
+            pstmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace(System.out);
         }
+    }
+
 
     // box formatting output
     private void printBoxedText(String text) {
