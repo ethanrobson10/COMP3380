@@ -220,7 +220,7 @@ public class DBExample {
 			if(num.equals("1")){
 				season = "2018-2019";
 			} else if(num.equals("2")){
-				season = "2018-2019";
+				season = "2019-2020";
 			} else {
 				System.out.println("Sorry '" + num + "' is not a season option\n");
 			}
