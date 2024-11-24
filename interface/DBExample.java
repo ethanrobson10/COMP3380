@@ -100,12 +100,24 @@ public class DBExample {
 				db.topNOfficialPenalties(n);
 			}
 
-			else if (parts[0].equals("all")) {
+			else if (parts[0].equals("aslp")) {
 				//db.readAll();
+				db.avgShiftLengthByPeriod();
 			}
 
-			else if (parts[0].equals("mr")) {
+			else if (parts[0].equals("pw")) {
 				//db.mostReadPerCountry();
+				String teamName = "";
+
+				while(teamName.length() == 0){
+					
+					System.out.print("\nteam: ");
+					teamName = console.nextLine();
+				}
+
+				String season = getSeason(console);
+				
+				db.totalPlayoffWins(teamName, season);
 			}
 
 			else
@@ -186,8 +198,13 @@ public class DBExample {
 		System.out.println("  tgap          |  Displays a players goals, assists, and            |  first: first name of the player                              ");	  
 		System.out.println("                |  total points from each season                     |  last: last name of the player                                ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  topNO         |  Displays the top numRows officials that call      |  numRows: the number of officials to display                        ");	  
+		System.out.println("  topNO         |  Displays the top numRows officials that call      |  numRows: the number of officials to display                  ");	  
 		System.out.println("                |  the most penalties against away teams             |                                ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  aslp          |  average shift length per period                   |  none");	  
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  pw            |  displays the total play off wins for a team       |  team: team to display wins for                   ");	  
+		System.out.println("                |  in a particular season                            |  season: the hockey season used for the calculations           ");
 		System.out.println("=====================================================================================================================================");
 
 	}
@@ -244,6 +261,8 @@ public class DBExample {
 		}
 		return season;
 	}
+
+
 
 
 }

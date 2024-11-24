@@ -17,6 +17,8 @@ import java.util.Properties;
  * (4) total goals score at all venues
  * (5) top N officials calling most penalties against away teams
  * 
+ * (8) average shift length per period
+ * (9) total play off wins for a team X in season Y
  * 
  * (11) top25 by goals/assists/points/plusMinus
  * 
@@ -423,6 +425,106 @@ public class HockeyDB {
         }
     }
 
+    // (8)
+    public void avgShiftLengthByPeriod() {
+        try {
+
+            String sql = """
+                    SELECT periodNumber, AVG(shiftEnd - shiftStart) as shiftLength 
+                    FROM shifts 
+                    GROUP BY periodNumber 
+                    ORDER BY periodNumber ASC 
+                """;
+
+            
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+
+            printBoxedText(String.format("Average shift length by period"));
+            String[] titles = { "period", "shift length"};
+            final int[] SPACINGS = { 8, 12 };
+            printTitles(titles, SPACINGS);
+            printDashes(titles, SPACINGS);
+
+            String[] columns = new String[titles.length];
+            while (rs.next()) { 
+                columns[0] = rs.getString(1);
+                columns[1] = rs.getString(2);
+                printTitles(columns, SPACINGS);
+            }
+
+            rs.close();
+            pstmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace(System.out);
+        }
+    }
+
+    // (9)
+    public void totalPlayoffWins(String teamName, String season) {
+        try {
+
+            String sql = """
+                    WITH homePloffWins AS ( 
+                    SELECT gameID, teamID, teamName  
+                    FROM games  
+                    JOIN teams ON games.homeTeamID = teams.teamID  
+                    WHERE  
+                    teams.teamName = ?
+                    AND games.season = ?
+                    AND games.type = 'P' 
+                    AND (games.outcome = 'home win reg' OR games.outcome = 'home win ot') 
+                    ), 
+
+                    awayPloffWins AS ( 
+                    SELECT gameID, teamID, teamName  
+                    FROM games  
+                    JOIN teams ON games.awayTeamID = teams.teamID  
+                    WHERE 
+                    teams.teamName = ?  
+                    AND games.season = ?  
+                    AND games.type = 'P'  
+                    AND (games.outcome = 'away win reg' OR games.outcome = 'away win ot') 
+                    ), 
+
+                    HomeAwayPloffWins AS ( 
+                    SELECT *  
+                    FROM homePloffWins 
+                    UNION  
+                    SELECT *  
+                    FROM awayPloffWIns 
+                    ) 
+
+                    SELECT COUNT(*) as totalPlayoffWins, 16 as max_possible FROM HomeAwayPloffWins; 
+                    """;
+
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            pstmt.setString(1, teamName);
+            pstmt.setString(2, season);
+            pstmt.setString(3, teamName);
+            pstmt.setString(4, season);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            printBoxedText(String.format("Total playoff wins for %s in the %s season", teamName, season));
+            String[] titles = { "wins"};
+            final int[] SPACINGS = {  };
+            printTitles(titles, SPACINGS);
+            printDashes(titles, SPACINGS);
+
+            String[] columns = new String[titles.length];
+            while (rs.next()) { 
+                columns[0] = rs.getString(1);
+                printTitles(columns, SPACINGS);
+            }
+
+            rs.close();
+            pstmt.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace(System.out);
+        }
+    }
 
     // box formatting output
     private void printBoxedText(String text) {
