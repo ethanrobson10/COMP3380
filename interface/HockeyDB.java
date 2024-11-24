@@ -16,6 +16,7 @@ import java.util.Properties;
  * (3) avg shift length before the player scores, gets shot, or penalty
  * (4) total goals score at all venues
  * (5) top N officials calling most penalties against away teams
+ * (6) Top N players having played on the most teams 
  * 
  * (8) average shift length per period
  * (9) total play off wins for a team X in season Y
@@ -178,6 +179,11 @@ public class HockeyDB {
 
     // (1)
     public void totalGoalsByTeam(String first, String last) {
+
+        if (!playerExists(first, last)) {
+            return;
+        }
+
         try {
 
             String sql = """
@@ -199,30 +205,25 @@ public class HockeyDB {
 
             ResultSet rs = pstmt.executeQuery();
 
-            if (!rs.next()) {
-                printBoxedText(String.format("Error: '%s %s' was not found.", first, last));
-            } else {
+            printBoxedText(String.format("Goals against each team for %s %s", first, last));
 
-                printBoxedText(String.format("Goals against each team for %s %s", first, last));
+            String[] titles = { "Team Name", "Goals Scored" };
+            final int[] SPACINGS = { 16 }; // SPACINGS[[i] is width of i'th column
+            printTitles(titles, SPACINGS);
+            printDashes(titles, SPACINGS);
 
-                String[] titles = { "Team Name", "Goals Scored" };
-                final int[] SPACINGS = { 16 }; // SPACINGS[[i] is width of i'th column
-                printTitles(titles, SPACINGS);
-                printDashes(titles, SPACINGS);
-
-                int totalGoals = 0;
-                do {
-                    String[] columns = { rs.getString("teamName"), rs.getString("numGoals") };
-                    printTitles(columns, SPACINGS);
-                    totalGoals += rs.getInt("numGoals");
-                } while (rs.next());
-
-                // Also display total goals after printing ?
-                printDashes(titles, SPACINGS);
-                String[] totals = { "Total:", "" + totalGoals };
-                printTitles(totals, SPACINGS);
-                System.out.println();
+            int totalGoals = 0;
+            while (rs.next()) {
+                String[] columns = { rs.getString("teamName"), rs.getString("numGoals") };
+                printTitles(columns, SPACINGS);
+                totalGoals += rs.getInt("numGoals");
             }
+
+            // display total goals after printing
+            printDashes(titles, SPACINGS);
+            String[] totals = { "Total:", "" + totalGoals };
+            printTitles(totals, SPACINGS);
+            System.out.println();
 
             rs.close();
             pstmt.close();
@@ -234,34 +235,39 @@ public class HockeyDB {
 
     // (2)
     public void totalGAP(String first, String last) {
+
+        if (!playerExists(first, last)) {
+            return;
+        }
+
         try {
 
             String sql = """
-                    with allGoals AS (
-                        SELECT players.playerID, players.firstName, players.lastName, season,
-                        count(plays.playID) as totalGoals
-                        FROM plays
-                        JOIN games ON games.gameID = plays.gameID
-                        JOIN players ON plays.playerID = players.playerID
-                        WHERE playType = 'Goal'
-                        Group by players.playerID, players.firstName, players.lastName, season
-                    ),
-                    allAssists AS (
-                        select assists.playerID, season, count(assists.playerID) as totalAssists
-                        FROM assists
-                        join plays on plays.playid = assists.playID
-                        JOIN games on games.gameID = plays.gameID
-                        where playType = 'Goal'
-                        Group by assists.playerID, season
-                    )
-                    SELECT allGoals.playerID, allGoals.season, totalGoals, totalAssists,
-                    sum(totalGoals + totalAssists) as totalPoints
-                    from allAssists join allGoals on allAssists.playerID = allgoals.playerID
-                    AND allAssists.season = allGoals.season
-                    WHERE firstName = ? And lastName = ?
-                    group by allGoals.playerID, firstName, lastName, totalGoals, totalAssists, allGoals.season
-                    order by allGoals.playerID, allGoals.season desc;
-                """;
+                        with allGoals AS (
+                            SELECT players.playerID, players.firstName, players.lastName, season,
+                            count(plays.playID) as totalGoals
+                            FROM plays
+                            JOIN games ON games.gameID = plays.gameID
+                            JOIN players ON plays.playerID = players.playerID
+                            WHERE playType = 'Goal'
+                            Group by players.playerID, players.firstName, players.lastName, season
+                        ),
+                        allAssists AS (
+                            select assists.playerID, season, count(assists.playerID) as totalAssists
+                            FROM assists
+                            join plays on plays.playid = assists.playID
+                            JOIN games on games.gameID = plays.gameID
+                            where playType = 'Goal'
+                            Group by assists.playerID, season
+                        )
+                        SELECT allGoals.playerID, allGoals.season, totalGoals, totalAssists,
+                        sum(totalGoals + totalAssists) as totalPoints
+                        from allAssists join allGoals on allAssists.playerID = allgoals.playerID
+                        AND allAssists.season = allGoals.season
+                        WHERE firstName = ? And lastName = ?
+                        group by allGoals.playerID, firstName, lastName, totalGoals, totalAssists, allGoals.season
+                        order by allGoals.playerID, allGoals.season desc;
+                    """;
 
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, first);
@@ -269,24 +275,20 @@ public class HockeyDB {
 
             ResultSet rs = pstmt.executeQuery();
 
-            if (!rs.next()) {
-                printBoxedText(String.format("Error: '%s %s' was not found.", first, last));
-            } else {
+            printBoxedText(String.format("Total Goals, Assists, and Points for %s %s", first, last));
 
-                printBoxedText(String.format("Total Goals, Assists, and Points for %s %s", first, last));
+            String[] titles = { "Player ID", "Season", "Goals", "Assists", "Points" };
+            final int[] SPACINGS = { 11, 12, 8, 9 }; // SPACINGS[[i] is width of i'th column
+            printTitles(titles, SPACINGS);
+            printDashes(titles, SPACINGS);
 
-                String[] titles = { "Player ID", "Season", "Goals", "Assists", "Points"};
-                final int[] SPACINGS = {11, 12, 8, 9}; // SPACINGS[[i] is width of i'th column
-                printTitles(titles, SPACINGS);
-                printDashes(titles, SPACINGS);
+            String[] columns = new String[titles.length];
 
-                String[] columns = new String[titles.length];
-                do {
-                    for (int i = 1; i <= titles.length; i++) {
-                        columns[i-1] = rs.getString(i);
-                    }
-                    printTitles(columns, SPACINGS);
-                } while (rs.next());
+            while (rs.next()) {
+                for (int i = 1; i <= titles.length; i++) {
+                    columns[i - 1] = rs.getString(i);
+                }
+                printTitles(columns, SPACINGS);
             }
 
             rs.close();
@@ -302,11 +304,11 @@ public class HockeyDB {
         try {
 
             String sql = """
-                    SELECT plays.playType, AVG(shiftEnd - shiftStart) avgShiftLength 
-                    FROM plays  
-                    JOIN shifts ON shifts.shiftID = plays.shiftID 
-                    GROUP BY plays.playType; 
-                """;
+                        SELECT plays.playType, AVG(shiftEnd - shiftStart) avgShiftLength
+                        FROM plays
+                        JOIN shifts ON shifts.shiftID = plays.shiftID
+                        GROUP BY plays.playType;
+                    """;
 
             PreparedStatement pstmt = connection.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
@@ -337,14 +339,14 @@ public class HockeyDB {
         try {
 
             String sql = """
-                    SELECT venues.venueName, COUNT(*) as numGoals 
-                    FROM plays  
-                    JOIN games ON plays.gameID = games.gameID 
-                    JOIN venues ON games.venueID = venues.venueID 
-                    WHERE games.season = ? AND plays.playType = 'Goal' 
-                    GROUP BY venues.venueID, venues.venueName 
-                    ORDER BY numGoals DESC;
-                """;
+                        SELECT venues.venueName, COUNT(*) as numGoals
+                        FROM plays
+                        JOIN games ON plays.gameID = games.gameID
+                        JOIN venues ON games.venueID = venues.venueID
+                        WHERE games.season = ? AND plays.playType = 'Goal'
+                        GROUP BY venues.venueID, venues.venueName
+                        ORDER BY numGoals DESC;
+                    """;
 
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, season);
@@ -376,27 +378,27 @@ public class HockeyDB {
         try {
 
             String sql = """
-                    WITH allAwayTeamPenalties AS ( 
-                        SELECT plays.gameID 
-                        FROM plays  
-                        JOIN games ON plays.gameID = games.gameID 
-                        JOIN playsOn ON plays.playerID = playson.playerID 
-                        WHERE plays.playType = 'Penalty' 
-                        AND playsOn.teamID = games.awayteamID 
-                    ) 
+                        WITH allAwayTeamPenalties AS (
+                            SELECT plays.gameID
+                            FROM plays
+                            JOIN games ON plays.gameID = games.gameID
+                            JOIN playsOn ON plays.playerID = playson.playerID
+                            WHERE plays.playType = 'Penalty'
+                            AND playsOn.teamID = games.awayteamID
+                        )
 
-                    SELECT officials.officialName, COUNT(*) AS numPenalties 
-                    FROM officiatedby 
-                    JOIN officials ON officiatedBy.officialID = officials.officialID 
-                    JOIN allAwayTeamPenalties ON allAwayTeamPenalties.gameID = officiatedBy.gameID 
-                    WHERE officiatedBy.officialType = 'Referee' 
-                    GROUP BY officials.officialID, officials.officialName 
-                    ORDER BY numPenalties DESC; 
-                """;
+                        SELECT officials.officialName, COUNT(*) AS numPenalties
+                        FROM officiatedby
+                        JOIN officials ON officiatedBy.officialID = officials.officialID
+                        JOIN allAwayTeamPenalties ON allAwayTeamPenalties.gameID = officiatedBy.gameID
+                        WHERE officiatedBy.officialType = 'Referee'
+                        GROUP BY officials.officialID, officials.officialName
+                        ORDER BY numPenalties DESC;
+                    """;
 
-            
             PreparedStatement pstmt = connection.prepareStatement(sql);
-            // pstmt.setInt(1, numRows); // Doesn't allow a placeholder parameter next to top see FIX below
+            // pstmt.setInt(1, numRows); // Doesn't allow a placeholder parameter next to
+            // top see FIX below
 
             ResultSet rs = pstmt.executeQuery();
 
@@ -408,7 +410,50 @@ public class HockeyDB {
 
             String[] columns = new String[titles.length];
             int rank = 1;
-            while (rs.next() && rank <= numRows) { //FIX: print until rank equals desired numRows
+            while (rs.next() && rank <= numRows) { // FIX: print until rank equals desired numRows
+                columns[0] = "" + rank;
+                // populate each row before printing it
+                for (int i = 1; i < titles.length; i++) {
+                    columns[i] = rs.getString(i);
+                }
+                printTitles(columns, SPACINGS);
+                rank++;
+            }
+
+            rs.close();
+            pstmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace(System.out);
+        }
+    }
+
+    // (6)
+    public void topTeamsPlayedFor(int numRows) {
+        try {
+
+            String sql = """
+                        SELECT firstName, lastName, COUNT(teamID) as numTeams 
+                        FROM playsOn  
+                        JOIN players ON playsOn.playerID = players.playerID 
+                        GROUP BY players.playerID, firstName, lastName 
+                        ORDER BY numTeams DESC; 
+                    """;
+
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            // pstmt.setInt(1, numRows); // Doesn't allow a placeholder parameter next to
+            // top see FIX below
+
+            ResultSet rs = pstmt.executeQuery();
+
+            printBoxedText(String.format("Top %d players who have played for the most teams", numRows));
+            String[] titles = { "Rank", "First", "Last", "No. Teams" };
+            final int[] SPACINGS = { 6, 16, 15 };
+            printTitles(titles, SPACINGS);
+            printDashes(titles, SPACINGS);
+
+            String[] columns = new String[titles.length];
+            int rank = 1;
+            while (rs.next() && rank <= numRows) { // FIX: print until rank equals desired numRows
                 columns[0] = "" + rank;
                 // populate each row before printing it
                 for (int i = 1; i < titles.length; i++) {
@@ -430,26 +475,26 @@ public class HockeyDB {
         try {
 
             String sql = """
-                    SELECT periodNumber, AVG(shiftEnd - shiftStart) as shiftLength 
-                    FROM shifts 
-                    GROUP BY periodNumber 
-                    ORDER BY periodNumber ASC 
-                """;
+                        SELECT periodNumber, AVG(shiftEnd - shiftStart) as shiftLength
+                        FROM shifts
+                        GROUP BY periodNumber
+                        ORDER BY periodNumber ASC
+                    """;
 
-            
+
             PreparedStatement pstmt = connection.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
 
             printBoxedText(String.format("Average shift length by period"));
-            String[] titles = { "period", "shift length"};
+            String[] titles = { "Period", "Shift Length" };
             final int[] SPACINGS = { 8, 12 };
             printTitles(titles, SPACINGS);
             printDashes(titles, SPACINGS);
 
             String[] columns = new String[titles.length];
-            while (rs.next()) { 
+            while (rs.next()) {
                 columns[0] = rs.getString(1);
-                columns[1] = rs.getString(2);
+                columns[1] = "" + getMins(rs.getInt(2));
                 printTitles(columns, SPACINGS);
             }
 
@@ -462,40 +507,45 @@ public class HockeyDB {
 
     // (9)
     public void totalPlayoffWins(String teamName, String season) {
+
+        if (!teamExists(teamName)) {
+            return;
+        }
+
         try {
 
             String sql = """
-                    WITH homePloffWins AS ( 
-                    SELECT gameID, teamID, teamName  
-                    FROM games  
-                    JOIN teams ON games.homeTeamID = teams.teamID  
-                    WHERE  
+                    WITH homePloffWins AS (
+                    SELECT gameID, teamID, teamName
+                    FROM games
+                    JOIN teams ON games.homeTeamID = teams.teamID
+                    WHERE
                     teams.teamName = ?
                     AND games.season = ?
-                    AND games.type = 'P' 
-                    AND (games.outcome = 'home win reg' OR games.outcome = 'home win ot') 
-                    ), 
+                    AND games.type = 'P'
+                    AND (games.outcome = 'home win reg' OR games.outcome = 'home win ot')
+                    ),
 
-                    awayPloffWins AS ( 
-                    SELECT gameID, teamID, teamName  
-                    FROM games  
-                    JOIN teams ON games.awayTeamID = teams.teamID  
-                    WHERE 
-                    teams.teamName = ?  
-                    AND games.season = ?  
-                    AND games.type = 'P'  
-                    AND (games.outcome = 'away win reg' OR games.outcome = 'away win ot') 
-                    ), 
+                    awayPloffWins AS (
+                    SELECT gameID, teamID, teamName
+                    FROM games
+                    JOIN teams ON games.awayTeamID = teams.teamID
+                    WHERE
+                    teams.teamName = ?
+                    AND games.season = ?
+                    AND games.type = 'P'
+                    AND (games.outcome = 'away win reg' OR games.outcome = 'away win ot')
+                    ),
 
-                    HomeAwayPloffWins AS ( 
-                    SELECT *  
-                    FROM homePloffWins 
-                    UNION  
-                    SELECT *  
-                    FROM awayPloffWIns 
-                    ) 
+                    HomeAwayPloffWins AS (
+                    SELECT *
+                    FROM homePloffWins
+                    UNION
+                    SELECT *
+                    FROM awayPloffWIns
+                    )
 
-                    SELECT COUNT(*) as totalPlayoffWins, 16 as max_possible FROM HomeAwayPloffWins; 
+                    SELECT COUNT(*) as totalPlayoffWins, 16 as max_possible FROM HomeAwayPloffWins;
                     """;
 
             PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -506,25 +556,29 @@ public class HockeyDB {
 
             ResultSet rs = pstmt.executeQuery();
 
-            printBoxedText(String.format("Total playoff wins for %s in the %s season", teamName, season));
-            String[] titles = { "wins"};
-            final int[] SPACINGS = {  };
+            printBoxedText(String.format("Total playoff wins for the %s in the %s season", teamName, season));
+
+            String[] titles = { "Wins", "Maximum" };
+            final int[] SPACINGS = { 10 };
             printTitles(titles, SPACINGS);
             printDashes(titles, SPACINGS);
 
-            String[] columns = new String[titles.length];
-            while (rs.next()) { 
-                columns[0] = rs.getString(1);
+            while (rs.next()){
+                String[] columns = { rs.getString(1), rs.getString(2) };
                 printTitles(columns, SPACINGS);
             }
 
             rs.close();
             pstmt.close();
-
+            
         } catch (SQLException e) {
             e.printStackTrace(System.out);
         }
     }
+
+    /* **********************************************
+     *                HELPER METHODS
+     ************************************************/
 
     // box formatting output
     private void printBoxedText(String text) {
@@ -603,7 +657,46 @@ public class HockeyDB {
 
     private String getMins(int seconds) {
         seconds %= 60;
-        int minutes = (seconds/60) % 60;
+        int minutes = (seconds / 60) % 60;
         return minutes + ":" + seconds;
+    }
+
+    private boolean playerExists(String first, String last) {
+        try {
+            String sql = "SELECT * from players WHERE firstName = ? AND lastName = ?;";
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            pstmt.setString(1, first);
+            pstmt.setString(2, last);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return true;
+            } else {
+                printBoxedText(String.format("Error: '%s %s' was not found.", first, last));
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(System.out);
+        }
+        return false;
+    }
+
+    private boolean teamExists(String teamName) {
+        try {
+            String sql = "SELECT * from teams WHERE teamName = ?;";
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            pstmt.setString(1, teamName);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return true;
+            } else {
+                printBoxedText(String.format("Error: the team '%s' was not found.", teamName));
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(System.out);
+        }
+        return false;
     }
 }

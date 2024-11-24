@@ -76,42 +76,29 @@ public class DBExample {
 				db.avgShiftByPlay();
 			}
 
-			else if (parts[0].equals("gbv")) {
-				//db.mostCities();
+			else if (parts[0].equals("gba")) {
 				String season = getSeason(console);
 				db.goalsByVenue(season);
 			}
 
 			else if (parts[0].equals("topNO")) { //Top N Officials
-				//db.ownBooks();
-				int n = 0; 
-				while(n <= 0) {
-					System.out.print("\nnumRows: ");
-					line = console.nextLine();
-					try {
-						n = Integer.parseInt(line);
-						if(n < 1) {
-							System.out.println("Sorry please enter an integer 1 or greater");
-						}
-					} catch(NumberFormatException nfe) {
-						System.out.println("Sorry please enter an integer 1 or greater");
-					}
-				}
-				db.topNOfficialPenalties(n);
+				int numRows = getValidInt("refs", console); // "refs" is the type we want to list
+				db.topNOfficialPenalties(numRows);
+			}
+
+			else if (parts[0].equals("mostTeams")) {
+				int numRows = getValidInt("players", console); // "players" is the type we want to list
+				db.topTeamsPlayedFor(numRows);
 			}
 
 			else if (parts[0].equals("aslp")) {
-				//db.readAll();
 				db.avgShiftLengthByPeriod();
 			}
 
 			else if (parts[0].equals("pw")) {
-				//db.mostReadPerCountry();
 				String teamName = "";
-
 				while(teamName.length() == 0){
-					
-					System.out.print("\nteam: ");
+					System.out.print("\nEnter the team name: ");
 					teamName = console.nextLine();
 				}
 
@@ -121,7 +108,7 @@ public class DBExample {
 			}
 
 			else
-				System.out.println("Read the help with h, or find help somewhere else.");
+				System.out.println("Unknown command, type h for help.");
 
 			System.out.print("db > ");
 			line = console.nextLine();
@@ -192,16 +179,19 @@ public class DBExample {
 		System.out.println("  asl           |  View the average shift length for a player before |  none             ");	  
 		System.out.println("                |  they attain one of the possible play types        |                   ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  gbv           |  List the total goals scored at each NHL           |  season: the hockey season used for the calculation           ");	  
+		System.out.println("  gba           |  List the total goals scored at each NHL           |  season: the hockey season used for the calculation           ");	  
 		System.out.println("                |  arena for a particular season                     |                   ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  tgap          |  Displays a players goals, assists, and            |  first: first name of the player                              ");	  
 		System.out.println("                |  total points from each season                     |  last: last name of the player                                ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  topNO         |  Displays the top numRows officials that call      |  numRows: the number of officials to display                  ");	  
+		System.out.println("  topNO         |  Displays the top 'numRows' officials that call    |  numRows: the number of officials to display                  ");	  
 		System.out.println("                |  the most penalties against away teams             |                                ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  aslp          |  average shift length per period                   |  none");	  
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  mostTeams     |  Displays the top 'numRows' players who have       |  numRows: the number of players to display                  ");	  
+		System.out.println("                |  played for the most NHL teams                     |                                ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  pw            |  displays the total play off wins for a team       |  team: team to display wins for                   ");	  
 		System.out.println("                |  in a particular season                            |  season: the hockey season used for the calculations           ");
@@ -256,10 +246,30 @@ public class DBExample {
 			} else if(num.equals("2")){
 				season = "2019-2020";
 			} else {
-				System.out.println("Sorry '" + num + "' is not a season option\n");
+				System.out.println("Sorry, '" + num + "' is not a season option");
 			}
 		}
 		return season;
+	}
+
+	private static int getValidInt(String type, Scanner console) {
+		int n = 0;
+		String line = "";
+		
+		while(n <= 0) {
+			System.out.printf("\nEnter the number of %s to include: ", type);
+			line = console.nextLine();
+			try {
+				n = Integer.parseInt(line);
+				if(n < 1) {
+					System.out.println("Sorry, Integer must be 1 or greater");
+				}
+			} catch(NumberFormatException nfe) {
+				System.out.println("Sorry, '" + n + "' is not a valid integer");
+			}
+		}
+
+		return n;
 	}
 
 
