@@ -105,6 +105,18 @@ public class DBExample {
 				String season = getSeason(console);
 				
 				db.totalPlayoffWins(teamName, season);
+			} 
+
+			else if(parts[0].equals("s")) {
+				String teamName = "";
+				while(teamName.length() == 0){
+					System.out.print("\nEnter the team name: ");
+					teamName = console.nextLine();
+				}
+
+				String season = getSeason(console);
+				
+				db.schedule(teamName, season);
 			}
 
 			else
@@ -195,6 +207,9 @@ public class DBExample {
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  pw            |  displays the total play off wins for a team       |  team: team to display wins for                   ");	  
 		System.out.println("                |  in a particular season                            |  season: the hockey season used for the calculations           ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  s             |  displays a teams schedule for a particular        |  team: team to display schedule for                   ");	  
+		System.out.println("                |  regular season                                    |  season: the season to find the schedule for          ");
 		System.out.println("=====================================================================================================================================");
 
 	}

@@ -576,6 +576,73 @@ public class HockeyDB {
         }
     }
 
+    public void schedule(String teamName, String season) {
+        if (!teamExists(teamName)) {
+            return;
+        }
+
+        try {
+            String[] years = season.split("-");
+            // Typical reg season spans from early october to mid april, 
+            // used september and june as wide parameters to ensure all games are acounted for
+            String firstHalfSeasonStart = years[0]+"-09-01"; //Early september
+            String lastHalfSeasonEnd =  years[1]+"-07-01"; //Early Juner
+
+            String sql = """
+                    WITH homeTeamGames AS (
+                        SELECT * FROM teams JOIN games ON teams.teamID = games.homeTeamID 
+                        WHERE teams.teamName = ? AND games.dateTime between ? AND ?  AND games.type = 'R'
+                    ),
+
+                    awayTeamGames AS (
+                        SELECT * FROM teams JOIN games on teams.teamID = games.awayTeamID
+                        WHERE teams.teamName = ? AND games.dateTime between ? AND ? AND games.type = 'R'
+                    ),
+
+                    seasonGames AS (
+                        SELECT homeTeamGames.teamName homeTeam, teams.teamName awayTeam, homeTeamGames.dateTime
+                        FROM homeTeamGames JOIN teams ON homeTeamGames.awayTeamID = teams.teamID
+                        UNION
+                        SELECT teams.teamName homeTeam, awayTeamGames.teamName awayTeam, awayTeamGames.dateTime
+                        FROM awayTeamGames JOIN teams ON awayTeamGames.homeTeamID = teams.teamID
+                    )
+
+                    SELECT * FROM seasonGames 
+                    ORDER BY dateTime;
+                    """;
+
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            pstmt.setString(1, teamName);
+            pstmt.setString(2, firstHalfSeasonStart);
+            pstmt.setString(3, lastHalfSeasonEnd);
+            pstmt.setString(4, teamName);
+            pstmt.setString(5, firstHalfSeasonStart);
+            pstmt.setString(6, lastHalfSeasonEnd);
+  
+
+            ResultSet rs = pstmt.executeQuery();
+
+
+            printBoxedText(String.format("%s schedule for the %s season", teamName, season));
+
+            String[] titles = { "Home Team", "Away Team", "Date" };
+            final int[] SPACINGS = { 16, 16 };
+            printTitles(titles, SPACINGS);
+            printDashes(titles, SPACINGS);
+
+            while (rs.next()){
+                String[] columns = { rs.getString(1), rs.getString(2), rs.getString(3) };
+                    printTitles(columns, SPACINGS);
+            }
+
+            rs.close();
+            pstmt.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace(System.out);
+        }
+    }
+
     /* **********************************************
      *                HELPER METHODS
      ************************************************/
