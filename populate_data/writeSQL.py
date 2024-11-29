@@ -1,6 +1,17 @@
 import pandas as pd
+import os
 
-FIRST_SEASON = "2018"
+PATH = '../../data/'
+team_info = PATH + "team_info.csv"
+game = PATH + "game.csv"
+player_info = PATH + "player_info.csv"
+game_skater_stats = PATH + "game_skater_stats.csv"
+game_goalie_stats = PATH + "game_goalie_stats.csv"
+game_officials = PATH + "game_officials.csv"
+game_shifts = PATH + "game_shifts.csv"
+game_plays = PATH + "game_plays.csv"
+
+FIRST_SEASON = "2015"
 
 SQL_CREATE_TABLES = """
 
@@ -161,7 +172,7 @@ CREATE TABLE assists (
 # returns pandas df
 def create_teams_df():
 
-  teams = pd.read_csv("../data/team_info.csv")
+  teams = pd.read_csv(team_info)
 
   teams.rename(columns={"shortName":"city", "team_id":"teamID"}, inplace=True)
   teams = teams[["teamID", "city", "teamName"]]
@@ -174,7 +185,7 @@ def create_teams_df():
 
 def create_venues_df():
   # Filter out venues for only those in timeframe we use?
-  games = pd.read_csv("../data/game.csv")
+  games = pd.read_csv(game)
 
   venues = games[["venue"]].drop_duplicates()
 
@@ -198,7 +209,7 @@ def create_venues_df():
 
 
 def create_games_df(venueID_mapper):
-  games = pd.read_csv("../data/game.csv")
+  games = pd.read_csv(game)
 
   games["venueID"] = games["venue"].map(venueID_mapper)
   games.rename(columns={"game_id":"gameID", "date_time_GMT":"dateTime", "home_team_id":"homeTeamID", "away_team_id":"awayTeamID"}, inplace=True)
@@ -226,7 +237,7 @@ def create_games_df(venueID_mapper):
 
 
 def create_player_df():
-  players = pd.read_csv("../data/player_info.csv")
+  players = pd.read_csv(player_info)
 
   players.rename(columns={"player_id":"playerID"}, inplace=True)
 
@@ -250,8 +261,8 @@ def create_player_df():
 
   
 def create_playsIn_df(valid_game_ids):
-  skater_game = pd.read_csv("../data/game_skater_stats.csv")
-  goalie_game = pd.read_csv("../data/game_goalie_stats.csv")
+  skater_game = pd.read_csv(game_skater_stats)
+  goalie_game = pd.read_csv(game_goalie_stats)
 
 
   skater_game.rename(columns={"game_id":"gameID", "player_id":"playerID"}, inplace=True)
@@ -272,8 +283,8 @@ def create_playsIn_df(valid_game_ids):
   return playsIn
 
 def create_playsOn_df(games_df):
-  skater_game = pd.read_csv("../data/game_skater_stats.csv")
-  goalie_game = pd.read_csv("../data/game_goalie_stats.csv")
+  skater_game = pd.read_csv(game_skater_stats)
+  goalie_game = pd.read_csv(game_goalie_stats)
 
   skater_game = skater_game[["game_id", "player_id", "team_id"]]
   goalie_game = goalie_game[["game_id", "player_id", "team_id"]]
@@ -319,7 +330,7 @@ def create_playsOn_df(games_df):
 
   
 def create_officials_df():
-  officials = pd.read_csv("../data/game_officials.csv")
+  officials = pd.read_csv(game_officials)
 
   officials.rename(columns={"official_name":"officialName"}, inplace=True)
   officials = officials[["officialName"]].drop_duplicates()
@@ -334,7 +345,7 @@ def create_officials_df():
 
 # note: a couple games of 5 and 6 refs
 def create_officiatedBy_df(officials_df, valid_game_ids):
-  officials_games = pd.read_csv("../data/game_officials.csv")
+  officials_games = pd.read_csv(game_officials)
 
   officials_games.rename(columns={"game_id": "gameID", "official_name":"officialName", "official_type": "officialType"}, inplace=True)
   officials_games = officials_games.drop_duplicates()
@@ -353,7 +364,7 @@ def create_officiatedBy_df(officials_df, valid_game_ids):
 
 
 def create_shifts_df(valid_game_ids):
-  shifts = pd.read_csv("../data/game_shifts.csv")
+  shifts = pd.read_csv(game_shifts)
 
   # ------------remove------------ just for testing
   # shifts = shifts.iloc[:1000] 
@@ -396,7 +407,7 @@ def create_shifts_df(valid_game_ids):
 def create_plays_df(shifts_df, valid_game_ids):
 
   # filter games in timeframe
-  plays_noPlayerID = pd.read_csv("../data/game_plays.csv")
+  plays_noPlayerID = pd.read_csv(game_plays)
   # rename the columns 
   plays_noPlayerID.rename(columns={"play_id": "playID", "game_id": "gameID", "period": "periodNumber", "event":"playType"}, inplace=True)
   valid_plays = ["Shot", "Goal", "Penalty"]
@@ -404,7 +415,7 @@ def create_plays_df(shifts_df, valid_game_ids):
   plays_noPlayerID = plays_noPlayerID.loc[plays_noPlayerID["gameID"].isin(valid_game_ids)]
 
   # filter 1) only important types of plays 2) games in timeframe,
-  original_plays_playerID = pd.read_csv("../data/game_plays_players.csv") 
+  original_plays_playerID = pd.read_csv("../../data/game_plays_players.csv") 
   original_plays_playerID.rename(columns={"play_id": "playID", "player_id": "playerID"}, inplace=True)
   plays_playerID = original_plays_playerID.copy()
   values = ["PenaltyOn", "Scorer", "Shooter"]
@@ -511,6 +522,26 @@ def convert_column_int(df, columns):
       df[col] = df[col].astype(pd.Int64Dtype())
     else:
       df[col] = df[col].astype(int)
+      
+      
+# break string into chunks of 50,000 lines each
+def split_chunks(sql_str, max_lines=50000):
+    lines = sql_str.splitlines()
+    chunks = []
+    current_chunk = []
+
+    for line in lines:
+        current_chunk.append(line)
+        # If the chunk reaches max_lines, finalize it
+        if len(current_chunk) >= max_lines:
+            chunks.append("\n".join(current_chunk))
+            current_chunk = []
+
+    # put any remaining lines as the last chunk
+    if current_chunk:
+        chunks.append("\n".join(current_chunk))
+
+    return chunks
 
 
 def main():
@@ -558,11 +589,25 @@ def main():
   all_inserts += create_inserts(assists, "assists")
   print("done plays")
 
-  with open('../inserts.sql', 'w') as file:
-    file.write(SQL_CREATE_TABLES)
-    file.write(all_inserts)
+  # with open('../inserts.sql', 'w') as file:
+  #   file.write(SQL_CREATE_TABLES)
+  #   file.write(all_inserts)
+  # print("\nSQL file created successfully")
+  
+  # create chunks folder in workspace
+  current_directory = os.getcwd()
+  final_directory = os.path.join(current_directory, r'sql_chunks')
+  if not os.path.exists(final_directory):
+    os.makedirs(final_directory)
+  
+  chunks = split_chunks(SQL_CREATE_TABLES + all_inserts, max_lines=50000)
+  for idx, chunk in enumerate(chunks, start=1):
+      with open(f"sql_chunks\sql_chunk_{idx}.sql", "w") as file:
+          file.write(chunk)
+          print(f"chunk_{idx}.sql created")
+  
+  print("\nSQL chunks created successfully")
 
-  print("\nSQL file created successfully")
 
 main()
 
