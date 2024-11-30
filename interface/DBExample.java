@@ -119,6 +119,29 @@ public class DBExample {
 				db.schedule(teamName, season);
 			}
 
+			else if(parts[0].equals("tpp")) {
+				int numRows = getValidInt("players", console); // "refs" is the type we want to list
+				db.topPlayersPenalties(numRows);
+			}
+
+			else if(parts[0].equals("psAll")) {
+				db.playersScoredAgainstAllTeams();
+			}
+
+			else if(parts[0].equals("gps")) {
+				db.goalsPerShotAllPlayers();
+			}
+
+			else if (parts[0].equals("sp")) { 
+
+				String name = "";
+				while(name.length() == 0){
+					System.out.print("\nEnter a player name (first, last, or both): ");
+					name = console.nextLine();
+				}
+				db.searchPlayer(name);
+			}
+
 			else
 				System.out.println("Unknown command, type h for help.");
 
@@ -200,6 +223,9 @@ public class DBExample {
 		System.out.println("  topNO         |  Displays the top 'numRows' officials that call    |  numRows: the number of officials to display                  ");	  
 		System.out.println("                |  the most penalties against away teams             |                                ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  tpp           |  Displays the top 'numRows' players that have      |  numRows: the number of players to display                  ");	  
+		System.out.println("                |  taken the most penalties                          |                                ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  aslp          |  average shift length per period                   |  none");	  
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  mostTeams     |  Displays the top 'numRows' players who have       |  numRows: the number of players to display                  ");	  
@@ -208,6 +234,15 @@ public class DBExample {
 		System.out.println("  pw            |  displays the total play off wins for a team       |  team: team to display wins for                   ");	  
 		System.out.println("                |  in a particular season                            |  season: the hockey season used for the calculations           ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  psAll         |  displays all players who have scored against      |  none                  ");	  
+		System.out.println("                |  all teams (not including their current team)      |                        ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  gps           |  displays all players and their goals per shot     |  none                  ");	  
+		System.out.println("                |  across their entire career (in descending order)  |                        ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  sp            |  displays all players that have a matching first   |  name: first name or last name of a player                   ");	  
+		System.out.println("                |  or last name as the entered 'name'                |        (can be a partial match)                ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  s             |  displays a teams schedule for a particular        |  team: team to display schedule for                   ");	  
 		System.out.println("                |  regular season                                    |  season: the season to find the schedule for          ");
 		System.out.println("=====================================================================================================================================");
@@ -215,7 +250,7 @@ public class DBExample {
 	}
 
 	public static void printTerms() {
-		System.out.println("=========== TERMINOLOGY ====================================================================");
+				System.out.println("=========== TERMINOLOGY ====================================================================");
         System.out.println("      TERM      |        DEFINITION                                                        ");
         System.out.println("----------------+---------------------------------------------------------------------------");
         System.out.println("  goal          | awarded to a player who scores on the opposing team's goalie           ");
