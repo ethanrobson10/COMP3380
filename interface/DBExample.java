@@ -35,10 +35,10 @@ public class DBExample {
 
 			else if (parts[0].equals("tgbt")) { 
 
-				String firstName = getPlayerName("first", console);
-				String lastName = getPlayerName("last", console);
-				db.totalGoalsByTeam(firstName, lastName);
+				String firstName = getTextInput(console, "\nEnter the players first name: " );
+				String lastName = getTextInput(console, "\nEnter the players last name: " );
 
+				db.totalGoalsByTeam(firstName, lastName);
 			}
 
 			else if (parts[0].equals("top25")) {
@@ -67,8 +67,8 @@ public class DBExample {
 			}
 
 			else if (parts[0].equals("tgap")) {
-				String firstName = getPlayerName("first", console);
-				String lastName = getPlayerName("last", console);
+				String firstName = getTextInput(console, "\nEnter the players first name: " );
+				String lastName = getTextInput(console, "\nEnter the players last name: " );
 				db.totalGAP(firstName, lastName);
 			}
 
@@ -96,24 +96,14 @@ public class DBExample {
 			}
 
 			else if (parts[0].equals("pw")) {
-				String teamName = "";
-				while(teamName.length() == 0){
-					System.out.print("\nEnter the team name: ");
-					teamName = console.nextLine();
-				}
-
+				String teamName = getTextInput(console, "\nEnter the team name: ");
 				String season = getSeason(console);
 				
 				db.totalPlayoffWins(teamName, season);
 			} 
 
 			else if(parts[0].equals("s")) {
-				String teamName = "";
-				while(teamName.length() == 0){
-					System.out.print("\nEnter the team name: ");
-					teamName = console.nextLine();
-				}
-
+				String teamName = getTextInput(console, "\nEnter the team name: ");
 				String season = getSeason(console);
 				
 				db.schedule(teamName, season);
@@ -134,11 +124,7 @@ public class DBExample {
 
 			else if (parts[0].equals("sp")) { 
 
-				String name = "";
-				while(name.length() == 0){
-					System.out.print("\nEnter a player name (first, last, or both): ");
-					name = console.nextLine();
-				}
+				String name = getTextInput(console, "\nEnter a player name (first, last, or both): ");
 				db.searchPlayer(name);
 			}
 
@@ -275,15 +261,6 @@ public class DBExample {
         System.out.println("===========================================================================================");
 	}
 
-	private static String getPlayerName(String nameType, Scanner console) {
-		String name = "";
-		while (name.length() == 0) {
-			System.out.printf("Enter the players %s name: ", nameType);
-			name = console.nextLine();
-		}
-		return name;
-	}
-
 	private static String getSeason(Scanner console) {
 		String num = "";
 		String season = "";
@@ -300,6 +277,16 @@ public class DBExample {
 			}
 		}
 		return season;
+	}
+
+	private static String getTextInput(Scanner console, String prompt) {
+		String name = "";
+		while(name.length() == 0){
+			System.out.print(prompt);
+			name = console.nextLine();
+		}
+
+		return name;
 	}
 
 	private static int getValidInt(String type, Scanner console) {
