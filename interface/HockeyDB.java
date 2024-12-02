@@ -800,7 +800,7 @@ public class HockeyDB {
                         FROM awayTeamGames JOIN teams ON awayTeamGames.homeTeamID = teams.teamID
                     )
 
-                    SELECT * FROM seasonGames 
+                    SELECT homeTeam, awayTeam, CAST(DATEADD(HOUR, -6, [dateTime]) AS DATE) AS date, CONVERT(TIME(0), DATEADD(HOUR, -6, [dateTime])) AS time FROM seasonGames 
                     ORDER BY dateTime;
                     """;
 
@@ -818,13 +818,13 @@ public class HockeyDB {
 
             printBoxedText(String.format("%s schedule for the %s season", teamName, season));
 
-            String[] titles = { "Home Team", "Away Team", "Date" };
-            final int[] SPACINGS = { 16, 16 };
+            String[] titles = { "Home Team", "Away Team", "Date", "Time (CST)" };
+            final int[] SPACINGS = { 16, 16, 14 };
             printTitles(titles, SPACINGS);
             printDashes(titles, SPACINGS);
 
             while (rs.next()){
-                String[] columns = { rs.getString(1), rs.getString(2), rs.getString(3) };
+                String[] columns = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4) };
                     printTitles(columns, SPACINGS);
             }
 
