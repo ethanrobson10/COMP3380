@@ -11,7 +11,7 @@ game_officials = PATH + "game_officials.csv"
 game_shifts = PATH + "game_shifts.csv"
 game_plays = PATH + "game_plays.csv"
 
-FIRST_SEASON = "2015"
+FIRST_SEASON = "2012"
 
 SQL_CREATE_TABLES = """
 
@@ -542,7 +542,17 @@ def split_chunks(sql_str, max_lines=50000):
         chunks.append("\n".join(current_chunk))
 
     return chunks
-
+  
+def create_meta_script(curr_directory, idx):
+  
+  BATCH_SIZE = 8 # number of SQL files to execute at once
+  with open(f"sql_meta_insert.sql", "w") as file:
+  
+  # NOTE 
+    for i in range(1, idx+1):
+      if (i > 1 and i%(BATCH_SIZE) == 0):
+        file.write("\n") # seperate batches 
+      file.write("--:r "+curr_directory+f"\sql_chunk_{i}.sql\n")
 
 def main():
   all_inserts = ""
@@ -600,13 +610,18 @@ def main():
   if not os.path.exists(final_directory):
     os.makedirs(final_directory)
   
-  chunks = split_chunks(SQL_CREATE_TABLES + all_inserts, max_lines=50000)
+  MAX_LINES = 50000
+  chunks = split_chunks(SQL_CREATE_TABLES + all_inserts, max_lines=MAX_LINES)
   for idx, chunk in enumerate(chunks, start=1):
       with open(f"sql_chunks\sql_chunk_{idx}.sql", "w") as file:
           file.write(chunk)
           print(f"chunk_{idx}.sql created")
   
   print("\nSQL chunks created successfully")
+  
+  
+  create_meta_script(current_directory+"\sql_chunks", idx)
+  print("\nSQL meta file created successfully")
 
 
 main()
