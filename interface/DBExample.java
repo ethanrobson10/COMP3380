@@ -2,6 +2,9 @@
 import java.util.Scanner;
 
 public class DBExample {
+
+	private static final String[] SEASONS = {"2012-2013", "2013-2014", "2014-2015", "2015-2016", "2016-2017", "2017-2018", "2018-2019", "2019-2020"};
+
 	public static void main(String[] args) throws Exception {
 		
 		HockeyDB db = new HockeyDB();
@@ -261,23 +264,51 @@ public class DBExample {
         System.out.println("===========================================================================================");
 	}
 
+// new get Season method just adjust global constant SEASONS for correct seasons
 	private static String getSeason(Scanner console) {
-		String num = "";
 		String season = "";
+
 		while(season.length() == 0){
-			
-			System.out.print("\nSelect a season:\n'1' for 2018-2019\n'2' for 2019-2020\nEnter coresponding number: ");
-			num = console.nextLine();
-			if(num.equals("1")){
-				season = "2018-2019";
-			} else if(num.equals("2")){
-				season = "2019-2020";
-			} else {
-				System.out.println("Sorry, '" + num + "' is not a season option");
-			}
+			printSeasonPrompt();
+			season = validateSeasonNumber(console);
 		}
+
 		return season;
 	}
+	
+	// seaons helper method
+	private static void printSeasonPrompt(){
+		String prompt = "Select a season:\n";
+
+		int count = 1;
+		for(int i = 0; i < SEASONS.length; i++){
+			prompt += "'" + count + "' for " + SEASONS[i] + "\n";
+			count++;
+		}
+		prompt += "Enter coresponding number: ";
+
+		System.out.print(prompt);
+	}
+
+	// seasons helper method
+	private static String validateSeasonNumber(Scanner console){
+		String season = "";
+		String strNum = "";
+		
+		strNum = console.nextLine();
+		for(int i = 0; i < SEASONS.length; i++){
+			
+			if(strNum.equals("" + (i+1))){
+				season = SEASONS[i];
+			}
+		}
+		if(season.length() == 0){
+			System.out.println("Sorry, '" + strNum + "' is not a season option");
+		}
+
+		return season;
+	}
+
 
 	private static String getTextInput(Scanner console, String prompt) {
 		String name = "";
