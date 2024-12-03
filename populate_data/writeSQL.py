@@ -521,6 +521,8 @@ def main():
   print("teams inserts created successfully")
 
   venues, venueID_mapper = create_venues_df()
+  # don't include Thrashers arenas
+  venues = venues.loc[venues["teamID"].isin(teams["teamID"])]
   all_inserts += create_inserts(venues, "venues")
   print("venues inserts created successfully")
 
