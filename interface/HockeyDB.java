@@ -96,30 +96,80 @@ public class HockeyDB {
         }
 
         try {
-            String sql = """
-                    	SELECT t.teamName,
-                            COUNT(CASE 
-                                WHEN p.playType = 'Goal' 
-                                    AND NOT (
-                                        t.teamID = po.teamID 
-                                        AND g.dateTime BETWEEN po.startDate AND ISNULL(po.endDate, GETDATE())
-                                    )
-                                THEN 1 
-                                ELSE NULL 
-                            END) AS numGoals
-                        FROM teams t
-                        LEFT JOIN games g ON t.teamID = g.homeTeamID OR t.teamID = g.awayTeamID
-                        LEFT JOIN plays p ON g.gameID = p.gameID
-                        LEFT JOIN players scorer ON p.playerID = scorer.playerID
-                        LEFT JOIN playsOn po ON scorer.playerID = po.playerID
-                        WHERE scorer.firstName = ? AND scorer.lastName = ?
-                        GROUP BY t.teamName
-                        ORDER BY numGoals DESC;
+            // String sql = """
+            //         	SELECT t.teamName,
+            //                 COUNT(CASE 
+            //                     WHEN p.playType = 'Goal' 
+            //                         AND NOT (
+            //                             t.teamID = po.teamID 
+            //                             AND g.dateTime BETWEEN po.startDate AND ISNULL(po.endDate, GETDATE())
+            //                         )
+            //                     THEN 1 
+            //                     ELSE NULL 
+            //                 END) AS numGoals
+            //             FROM teams t
+            //             LEFT JOIN games g ON t.teamID = g.homeTeamID OR t.teamID = g.awayTeamID
+            //             LEFT JOIN plays p ON g.gameID = p.gameID
+            //             LEFT JOIN players scorer ON p.playerID = scorer.playerID
+            //             LEFT JOIN playsOn po ON scorer.playerID = po.playerID
+            //             WHERE scorer.firstName = ? AND scorer.lastName = ?
+            //             GROUP BY t.teamName
+            //             ORDER BY numGoals DESC;
+            //         """;
+
+                    String sql = """
+	                -- Goals scored on teams that were home
+						with homeGoals as (
+                            SELECT t.teamName,
+                                COUNT(CASE 
+                                    WHEN p.playType = 'Goal' 
+                                        AND (
+                                            po.teamID = g.awayTeamID
+                                            AND g.dateTime BETWEEN po.startDate AND ISNULL(po.endDate, GETDATE())
+                                        )
+                                    THEN 1 
+                                    ELSE NULL 
+                                END) AS numGoals
+                            FROM teams t
+                            LEFT JOIN games g ON t.teamID = g.homeTeamID
+                            LEFT JOIN plays p ON g.gameID = p.gameID
+                            LEFT JOIN players scorer ON p.playerID = scorer.playerID
+                            LEFT JOIN playsOn po ON scorer.playerID = po.playerID
+                            WHERE scorer.firstName = ? AND scorer.lastName = ?
+                            GROUP BY t.teamName
+						),
+
+						-- Goals scored on teams that were away
+						awayGoals as (
+                            SELECT t.teamName,
+                                COUNT(CASE 
+                                    WHEN p.playType = 'Goal' 
+                                        AND (
+                                            po.teamID = g.homeTeamID
+                                            AND g.dateTime BETWEEN po.startDate AND ISNULL(po.endDate, GETDATE())
+                                        )
+                                    THEN 1 
+                                    ELSE NULL 
+                                END) AS numGoals
+                            FROM teams t
+                            LEFT JOIN games g ON t.teamID = g.awayTeamID
+                            LEFT JOIN plays p ON g.gameID = p.gameID
+                            LEFT JOIN players scorer ON p.playerID = scorer.playerID
+                            LEFT JOIN playsOn po ON scorer.playerID = po.playerID
+                            WHERE scorer.firstName = ? AND scorer.lastName = ?
+                            GROUP BY t.teamName
+						)
+
+						SELECT teamName, sum(numGoals) goalTotal FROM 
+						(SELECT teamName, numGoals FROM homeGoals UNION ALL SELECT teamName, numGoals FROM awayGoals) x 
+						GROUP BY teamName ORDER BY goalTotal DESC;
                     """;
 
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, first);
             pstmt.setString(2, last);
+            pstmt.setString(3, first);
+            pstmt.setString(4, last);
 
             ResultSet rs = pstmt.executeQuery();
 
@@ -132,9 +182,9 @@ public class HockeyDB {
 
             int totalGoals = 0;
             while (rs.next()) {
-                String[] columns = { rs.getString("teamName"), rs.getString("numGoals") };
+                String[] columns = { rs.getString(1), rs.getString(2) };
                 printTitles(columns, SPACINGS);
-                totalGoals += rs.getInt("numGoals");
+                totalGoals += rs.getInt(2);
             }
 
             // display total goals after printing
