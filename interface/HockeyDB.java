@@ -69,28 +69,52 @@ public class HockeyDB {
         }
 
     }
+
+    public void example() {
+        String steps = """
+                    Try the following examples set of commands to get started!
+                    
+                    1) Enter 'sp'
+                    2) Enter 'claude' when prompted for a name
+                    3) See 'Claude Giroux' in the resulting list
+                    4) Enter 'tgap'
+                    5) Enter 'Claude' when promoted for a first name
+                    6) Enter 'Giroux' when prompted for a last name
+                    7) See Claude Giroux's player stats in the resulting table
+
+                    Congratulations! You have succesfully completed your first set of commands in the NHL database.
+                 """;
+
+        System.out.println(steps);
+    }
     
 
     // (1)
     public void totalGoalsByTeam(String first, String last) {
-
         if (!playerExists(first, last)) {
             return;
         }
 
         try {
-
             String sql = """
-                    	SELECT teamName, COUNT(*) as numGoals
-                    	FROM teams
-                    	JOIN playsOn ON teams.teamID = playsOn.teamID
-                    	JOIN plays ON playsOn.playerID = plays.goalieID
-                    	JOIN players ON plays.playerID = players.playerID
-                    	WHERE
-                    	players.firstName = ?
-                    	AND players.lastName = ?
-                    	AND playType = 'Goal'
-                    	GROUP BY teamName  ORDER BY numGoals DESC;
+                    	SELECT t.teamName,
+                            COUNT(CASE 
+                                WHEN p.playType = 'Goal' 
+                                    AND NOT (
+                                        t.teamID = po.teamID 
+                                        AND g.dateTime BETWEEN po.startDate AND ISNULL(po.endDate, GETDATE())
+                                    )
+                                THEN 1 
+                                ELSE NULL 
+                            END) AS numGoals
+                        FROM teams t
+                        LEFT JOIN games g ON t.teamID = g.homeTeamID OR t.teamID = g.awayTeamID
+                        LEFT JOIN plays p ON g.gameID = p.gameID
+                        LEFT JOIN players scorer ON p.playerID = scorer.playerID
+                        LEFT JOIN playsOn po ON scorer.playerID = po.playerID
+                        WHERE scorer.firstName = ? AND scorer.lastName = ?
+                        GROUP BY t.teamName
+                        ORDER BY numGoals DESC;
                     """;
 
             PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -124,7 +148,6 @@ public class HockeyDB {
         } catch (SQLException e) {
             e.printStackTrace(System.out);
         }
-
     }
 
     // (2)

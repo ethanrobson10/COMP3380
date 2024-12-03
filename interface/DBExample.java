@@ -129,6 +129,10 @@ public class DBExample {
 
 				String name = getTextInput(console, "\nEnter a player name (first, last, or both): ");
 				db.searchPlayer(name);
+			} 
+
+			else if(parts[0].equals("ex")) {
+				db.example();
 			}
 
 			else
