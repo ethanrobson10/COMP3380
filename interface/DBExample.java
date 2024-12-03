@@ -10,7 +10,7 @@ public class DBExample {
 		HockeyDB db = new HockeyDB();
 		runConsole(db);
 		
-		System.out.println("Exiting...");
+		System.out.println("\nThank You for using the NHL database!\n");
 	}
 
 
@@ -18,7 +18,7 @@ public class DBExample {
 
 		Scanner console = new Scanner(System.in);
 		welcomeMsg();
-		System.out.print("db > ");
+		System.out.print("NHL Database > ");
 		String line = console.nextLine();
 		String[] parts;
 		String arg = "";
@@ -28,24 +28,45 @@ public class DBExample {
 			if (line.indexOf(" ") > 0)
 				arg = line.substring(line.indexOf(" ")).trim();
 
-			if (parts[0].equals("h"))
+			if (parts[0].equals("h")){
 				printHelp();
-			else if (parts[0].equals("teams")) {
-				db.allTeams();
-			} else if(parts[0].equals("terms")) {
+			}
+
+			else if(parts[0].equals("terms")) {
 				printTerms();
 			}
 
-			else if (parts[0].equals("tgbt")) { 
+			else if(parts[0].equals("ex")) {
+				db.example();
+			}
+			
+			// (13) all Teams
+			else if (parts[0].equals("teams")) {
+				db.allTeams();
+			} 
 
+			// (14) search for a player by name
+			else if (parts[0].equals("sp")) { 
+				String name = getTextInput(console, "\nEnter a player name (first, last, or both): ");
+				db.searchPlayer(name);
+			} 
+
+			// (2) total goals, assists, points for player
+			else if (parts[0].equals("tgap")) {
 				String firstName = getTextInput(console, "\nEnter the players first name: " );
 				String lastName = getTextInput(console, "\nEnter the players last name: " );
+				db.totalGAP(firstName, lastName);
+			}
 
+			// (1) total goals against each team for a player
+			else if (parts[0].equals("tgbt")) { 
+				String firstName = getTextInput(console, "\nEnter the players first name: " );
+				String lastName = getTextInput(console, "\nEnter the players last name: " );
 				db.totalGoalsByTeam(firstName, lastName);
 			}
 
+			// (11) top25 player by goals/assists/points/plusMinus
 			else if (parts[0].equals("top25")) {
-				
 				String statType = "";
 				while(statType.length() == 0){
 					
@@ -69,35 +90,15 @@ public class DBExample {
 				db.top25byStat(statType, season);
 			}
 
-			else if (parts[0].equals("tgap")) {
-				String firstName = getTextInput(console, "\nEnter the players first name: " );
-				String lastName = getTextInput(console, "\nEnter the players last name: " );
-				db.totalGAP(firstName, lastName);
-			}
-
-			else if (parts[0].equals("asl")) {
-				db.avgShiftByPlay();
-			}
-
-			else if (parts[0].equals("gba")) {
+			// (15) a team's game schedule
+			else if(parts[0].equals("gs")) {
+				String teamName = getTextInput(console, "\nEnter the team name: ");
 				String season = getSeason(console);
-				db.goalsByVenue(season);
+
+				db.schedule(teamName, season);
 			}
 
-			else if (parts[0].equals("topNO")) { //Top N Officials
-				int numRows = getValidInt("refs", console); // "refs" is the type we want to list
-				db.topNOfficialPenalties(numRows);
-			}
-
-			else if (parts[0].equals("mostTeams")) {
-				int numRows = getValidInt("players", console); // "players" is the type we want to list
-				db.topTeamsPlayedFor(numRows);
-			}
-
-			else if (parts[0].equals("aslp")) {
-				db.avgShiftLengthByPeriod();
-			}
-
+			// (9) total play off wins for a team X in season Y
 			else if (parts[0].equals("pw")) {
 				String teamName = getTextInput(console, "\nEnter the team name: ");
 				String season = getSeason(console);
@@ -105,40 +106,59 @@ public class DBExample {
 				db.totalPlayoffWins(teamName, season);
 			} 
 
-			else if(parts[0].equals("s")) {
-				String teamName = getTextInput(console, "\nEnter the team name: ");
+			// (4) total goals score at all venues
+			else if (parts[0].equals("gba")) {
 				String season = getSeason(console);
-				
-				db.schedule(teamName, season);
+				db.goalsByVenue(season);
 			}
 
+			// (6) Top N players having played on the most teams 
+			else if (parts[0].equals("mt")) {
+				int numRows = getValidInt("players", console); // "players" is the type we want to list
+				db.topTeamsPlayedFor(numRows);
+			}
+
+			// (7) top N players who have taken the most penalities
 			else if(parts[0].equals("tpp")) {
 				int numRows = getValidInt("players", console); // "refs" is the type we want to list
 				db.topPlayersPenalties(numRows);
 			}
 
-			else if(parts[0].equals("psAll")) {
-				db.playersScoredAgainstAllTeams();
+			// (5) top N officials calling most penalties against away teams
+			else if (parts[0].equals("topNO")) { //Top N Officials
+				int numRows = getValidInt("refs", console); // "refs" is the type we want to list
+				db.topNOfficialPenalties(numRows);
 			}
 
+			// (12) goals per shot for all players, descending order
 			else if(parts[0].equals("gps")) {
 				db.goalsPerShotAllPlayers();
 			}
 
-			else if (parts[0].equals("sp")) { 
-
-				String name = getTextInput(console, "\nEnter a player name (first, last, or both): ");
-				db.searchPlayer(name);
-			} 
-
-			else if(parts[0].equals("ex")) {
-				db.example();
+			// (16) players with the most gordie howe hat tricks
+			else if(parts[0].equals("ghh")) {
+				db.gordieHoweHatTrick();
 			}
 
-			else
-				System.out.println("Unknown command, type h for help.");
+			// (10) players who have scored against all teams except their current team
+			else if(parts[0].equals("sAll")) {
+				db.playersScoredAgainstAllTeams();
+			}
 
-			System.out.print("db > ");
+			// (8) average shift length per period
+			else if (parts[0].equals("aslp")) {
+				db.avgShiftLengthByPeriod();
+			}
+
+			// (3) avg shift length before the player scores, gets shot, or penalty
+			else if (parts[0].equals("asl")) {
+				db.avgShiftByPlay();
+			}
+			
+			else
+				System.out.println("Unknown command, type h for the help menu.");
+
+			System.out.print("\nNHL Database > ");
 			line = console.nextLine();
 		}
 
@@ -146,6 +166,8 @@ public class DBExample {
 	}
 
 	private static void welcomeMsg() {
+				// added some space from make run code
+				System.out.println("\n");
         hockeyStickEnclosedMsg(5, "Welcome to the NHL Database!");
 
         String msg = """
@@ -192,52 +214,57 @@ public class DBExample {
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  q             |  Exits this program                                |  none             ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  ex            |  (For new users) Displays an example of user       |  none             ");
-		System.out.println("                |  inputs to find a player and get their statistics  |                   ");
-		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  terms         |  (For new users) Lists the meaning of any          |  none             ");
 		System.out.println("                |  unfamiliar hockey terms in the system             |                   ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  top25         |  Displays the top 25 players determined by your    |  statistic: 'g'=goals, 'a'=assists, 'p'=points, '+'=plus-minus");
-		System.out.println("                |  desired statistic, for a particular season        |  season: regular season to calculate the top player statistics");
+		System.out.println("  ex            |  (For new users) Displays an example of user       |  none             ");
+		System.out.println("                |  inputs to find a player and get their statistics  |                   ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  tgbt          |  Displays total goals scored against each team     |  first: first name of the player                              ");	  
-		System.out.println("                |  for a chosen player                               |  last: last name of the player                                ");
+		System.out.println("  teams         |  displays all teams in the NHL                     |  none");	  
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  asl           |  View the average shift length for a player before |  none             ");	  
-		System.out.println("                |  they attain one of the possible play types        |                   ");
-		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  gba           |  List the total goals scored at each NHL           |  season: the hockey season used for the calculation           ");	  
-		System.out.println("                |  arena for a particular season                     |                   ");
+		System.out.println("  sp            |  displays all players that have a matching first,  |  name: first name, last name, or both names separated         ");
+		System.out.println("                |  last, or both names as the entered 'name'         |  by a space for a player (can be a partial match)         ");	  
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  tgap          |  Displays a players goals, assists, and            |  first: first name of the player                              ");	  
 		System.out.println("                |  total points from each season                     |  last: last name of the player                                ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  topNO         |  Displays the top 'numRows' officials that call    |  numRows: the number of officials to display                  ");	  
-		System.out.println("                |  the most penalties against away teams             |                                ");
+		System.out.println("  tgbt          |  Displays total goals scored against each team     |  first: first name of the player                              ");	  
+		System.out.println("                |  for a chosen player                               |  last: last name of the player                                ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  top25         |  Displays the top 25 players determined by your    |  statistic: 'g'=goals, 'a'=assists, 'p'=points, '+'=plus-minus");
+		System.out.println("                |  desired statistic, for a particular season        |  season: regular season to calculate the top player statistics");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  gs            |  Displays a teams schedule for a particular        |  team: team to display schedule for                   ");	  
+		System.out.println("                |  regular season                                    |  season: the season to find the schedule for          ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  pw            |  Displays the total play off wins for a team       |  team: team to display wins for                   ");	  
+		System.out.println("                |  in a particular season                            |  season: the hockey season used for the calculations           ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  gba           |  List the total goals scored at each NHL           |  season: the hockey season used for the calculation           ");	  
+		System.out.println("                |  arena for a particular season                     |                   ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  mt            |  Displays the top 'numRows' players who have       |  numRows: the number of players to display                  ");	  
+		System.out.println("                |  played for the most NHL teams                     |                                ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  tpp           |  Displays the top 'numRows' players that have      |  numRows: the number of players to display                  ");	  
 		System.out.println("                |  taken the most penalties                          |                                ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  aslp          |  average shift length per period                   |  none");	  
+		System.out.println("  topNO         |  Displays the top 'numRows' officials that call    |  numRows: the number of officials to display                  ");	  
+		System.out.println("                |  the most penalties against away teams             |                                ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  mostTeams     |  Displays the top 'numRows' players who have       |  numRows: the number of players to display                  ");	  
-		System.out.println("                |  played for the most NHL teams                     |                                ");
-		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  pw            |  displays the total play off wins for a team       |  team: team to display wins for                   ");	  
-		System.out.println("                |  in a particular season                            |  season: the hockey season used for the calculations           ");
-		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  psAll         |  displays all players who have scored against      |  none                  ");	  
-		System.out.println("                |  all teams (not including their current team)      |                        ");
-		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  gps           |  displays all players and their goals per shot     |  none                  ");	  
+		System.out.println("  gps           |  Displays all players and their goals per shot     |  none                  ");	  
 		System.out.println("                |  across their entire career (in descending order)  |                        ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  sp            |  displays all players that have a matching first   |  name: first name or last name of a player                   ");	  
-		System.out.println("                |  or last name as the entered 'name'                |        (can be a partial match)                ");
+		System.out.println("  ghh           |  Displays players who have had a Gordie Howe Hat   |  none                  ");	  
+		System.out.println("                |  Trick (goal, assist, penalty in one game)         |                        ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  s             |  displays a teams schedule for a particular        |  team: team to display schedule for                   ");	  
-		System.out.println("                |  regular season                                    |  season: the season to find the schedule for          ");
+		System.out.println("  sAll          |  Displays all players who have scored against      |  none                  ");	  
+		System.out.println("                |  all teams (not including their current team)      |                        ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  aslp          |  Displays the average shift length per period      |  none");	  
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  asl           |  Displays the average shift length for a player    |  none             ");	  
+		System.out.println("                |  when they attain one of the possible play types   |                   ");
 		System.out.println("=====================================================================================================================================");
 
 	}
@@ -265,7 +292,7 @@ public class DBExample {
         System.out.println("----------------+---------------------------------------------------------------------------");
         System.out.println("  overtime      | when a hockey game extends the number of periods to 4 or more as a      ");
         System.out.println("                | result of a tie at the end of the 3rd                                  ");
-        System.out.println("===========================================================================================");
+        System.out.println("============================================================================================");
 	}
 
 // new get Season method just adjust global constant SEASONS for correct seasons
@@ -282,7 +309,7 @@ public class DBExample {
 	
 	// seaons helper method
 	private static void printSeasonPrompt(){
-		String prompt = "Select a season:\n";
+		String prompt = "\nSelect a season\n";
 
 		int count = 1;
 		for(int i = 0; i < SEASONS.length; i++){
@@ -343,8 +370,6 @@ public class DBExample {
 
 		return n;
 	}
-
-
 
 
 }

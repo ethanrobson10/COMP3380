@@ -25,6 +25,8 @@ import java.util.Properties;
  * (12) goals per shot for all players, descending order 
  * (13) all Teams
  * (14) search for a player by name
+ * (15) a team's game schedule
+ * (16) players with the most gordie howe hat tricks
  */
 
 public class HockeyDB {
@@ -817,20 +819,26 @@ public class HockeyDB {
 
             ResultSet rs = pstmt.executeQuery();
 
-            printBoxedText(String.format("Players with a name matching '%s'", name));
+            // added to print out alternative message if no matches are found
+            if (!rs.isBeforeFirst()) {
+                printBoxedText(String.format("Sorry there are no players matching the name '%s'", name));
+            } else {
+        
+                printBoxedText(String.format("Players with a name matching '%s'", name));
 
-            String[] titles = { "First", "Last", "Player Type", "Nationality", "Date of Birth", "Height", "Weight" };
-            final int[] SPACINGS = { 16, 15, 14, 14, 16, 10 }; // SPACINGS[[i] is width of i'th column
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+                String[] titles = { "First", "Last", "Player Type", "Nationality", "Date of Birth", "Height", "Weight" };
+                final int[] SPACINGS = { 16, 15, 14, 14, 16, 10 }; // SPACINGS[[i] is width of i'th column
+                printTitles(titles, SPACINGS);
+                printDashes(titles, SPACINGS);
 
-            String[] columns = new String[titles.length];
+                String[] columns = new String[titles.length];
 
-            while (rs.next()) {
-                for (int i = 1; i <= titles.length; i++) {
-                    columns[i - 1] = rs.getString(i);
+                while (rs.next()) {
+                    for (int i = 1; i <= titles.length; i++) {
+                        columns[i - 1] = rs.getString(i);
+                    }
+                    printTitles(columns, SPACINGS);
                 }
-                printTitles(columns, SPACINGS);
             }
 
             rs.close();
@@ -841,7 +849,7 @@ public class HockeyDB {
 
     }
 
-
+    // (15)
     public void schedule(String teamName, String season) {
         if (!teamExists(teamName)) {
             return;
@@ -904,6 +912,61 @@ public class HockeyDB {
             rs.close();
             pstmt.close();
 
+        } catch (SQLException e) {
+            e.printStackTrace(System.out);
+        }
+    }
+
+    // (16)
+    public void gordieHoweHatTrick() {
+        try {
+
+            String sql = """
+                   WITH gordHats AS (
+                    SELECT players.playerID, players.firstname, players.lastname, outerPlays.gameID
+                    FROM players 
+                    JOIN plays outerPlays ON players.playerID = outerPlays.playerID
+                    WHERE playType = 'Goal'
+                    AND players.playerID IN (
+                        SELECT innerPlays.playerID
+                        FROM plays innerPlays
+                        WHERE innerPlays.gameID = outerPlays.gameID
+                        AND innerPlays.playType = 'Penalty'
+                    )
+                    AND players.playerID IN (
+                        SELECT assists.playerID
+                        FROM assists
+                        JOIN plays innerPlays ON assists.playID = innerPlays.playID
+                        WHERE innerPlays.gameID = outerPlays.gameID
+                    )
+                )
+
+                SELECT firstname, lastname, COUNT(*) as numGordHats
+                FROM gordHats
+                GROUP BY playerID, firstname, lastname
+                ORDER BY numGordHats DESC;
+            """;
+
+
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+
+            printBoxedText(String.format("Players with the most Gordie Howe Hat Tricks"));
+            String[] titles = { "First", "Last", "No. Hat Tricks" };
+            final int[] SPACINGS = { 16, 15 };
+            printTitles(titles, SPACINGS);
+            printDashes(titles, SPACINGS);
+
+            String[] columns = new String[titles.length];
+            while (rs.next()) {
+                columns[0] = rs.getString(1);
+                columns[1] = rs.getString(2);
+                columns[2] = rs.getString(3);
+                printTitles(columns, SPACINGS);
+            }
+
+            rs.close();
+            pstmt.close();
         } catch (SQLException e) {
             e.printStackTrace(System.out);
         }
