@@ -1,13 +1,13 @@
 
-build: DBExample.class
+build: HockeyDBInterface.class
 
-DBExample.class: DBExample.java
-	javac DBExample.java
+HockeyDBInterface.class: HockeyDBInterface.java
+	javac HockeyDBInterface.java
 
-run: DBExample.class
-	java -cp .:mssql-jdbc-11.2.0.jre11.jar DBExample
+run: HockeyDBInterface.class
+	java -cp .:mssql-jdbc-11.2.0.jre11.jar HockeyDBInterface
 
 clean:
-	rm DBExample.class
+	rm HockeyDBInterface.class
 	rm HockeyDB.class
 	rm TablePrinter.class
