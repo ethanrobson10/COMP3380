@@ -77,12 +77,12 @@ public class HockeyDB {
                     Try the following examples set of commands to get started!
                     
                     1) Enter 'sp'
-                    2) Enter 'claude' when prompted for a name
-                    3) See 'Claude Giroux' in the resulting list
+                    2) Enter 'tom' when prompted for a name
+                    3) See 'Tom Wilson' in the resulting list
                     4) Enter 'tgap'
-                    5) Enter 'Claude' when promoted for a first name
-                    6) Enter 'Giroux' when prompted for a last name
-                    7) See Claude Giroux's player stats in the resulting table
+                    5) Enter 'Tom' when promoted for a first name
+                    6) Enter 'Wilson' when prompted for a last name
+                    7) See Tom Wilson's player stats in the resulting table
 
                     Congratulations! You have succesfully completed your first set of commands in the NHL database.
                  """;
