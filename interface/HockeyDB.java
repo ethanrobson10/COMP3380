@@ -98,27 +98,6 @@ public class HockeyDB {
         }
 
         try {
-            // String sql = """
-            //         	SELECT t.teamName,
-            //                 COUNT(CASE 
-            //                     WHEN p.playType = 'Goal' 
-            //                         AND NOT (
-            //                             t.teamID = po.teamID 
-            //                             AND g.dateTime BETWEEN po.startDate AND ISNULL(po.endDate, GETDATE())
-            //                         )
-            //                     THEN 1 
-            //                     ELSE NULL 
-            //                 END) AS numGoals
-            //             FROM teams t
-            //             LEFT JOIN games g ON t.teamID = g.homeTeamID OR t.teamID = g.awayTeamID
-            //             LEFT JOIN plays p ON g.gameID = p.gameID
-            //             LEFT JOIN players scorer ON p.playerID = scorer.playerID
-            //             LEFT JOIN playsOn po ON scorer.playerID = po.playerID
-            //             WHERE scorer.firstName = ? AND scorer.lastName = ?
-            //             GROUP BY t.teamName
-            //             ORDER BY numGoals DESC;
-            //         """;
-
                     String sql = """
 	                -- Goals scored on teams that were home
 						with homeGoals as (
@@ -175,25 +154,27 @@ public class HockeyDB {
 
             ResultSet rs = pstmt.executeQuery();
 
+            
             printBoxedText(String.format("Goals against each team for %s %s", first, last));
-
             String[] titles = { "Team Name", "Goals Scored" };
-            final int[] SPACINGS = { 16 }; // SPACINGS[[i] is width of i'th column
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSet(rs, titles);
 
-            int totalGoals = 0;
-            while (rs.next()) {
-                String[] columns = { rs.getString(1), rs.getString(2) };
-                printTitles(columns, SPACINGS);
-                totalGoals += rs.getInt(2);
-            }
+            // final int[] SPACINGS = { 16 }; // SPACINGS[[i] is width of i'th column
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
 
-            // display total goals after printing
-            printDashes(titles, SPACINGS);
-            String[] totals = { "Total:", "" + totalGoals };
-            printTitles(totals, SPACINGS);
-            System.out.println();
+            // int totalGoals = 0;
+            // while (rs.next()) {
+            //     String[] columns = { rs.getString(1), rs.getString(2) };
+            //     printTitles(columns, SPACINGS);
+            //     totalGoals += rs.getInt(2);
+            // }
+
+            // // display total goals after printing
+            // printDashes(titles, SPACINGS);
+            // String[] totals = { "Total:", "" + totalGoals };
+            // printTitles(totals, SPACINGS);
+            // System.out.println();
 
             rs.close();
             pstmt.close();
@@ -247,18 +228,21 @@ public class HockeyDB {
             printBoxedText(String.format("Total Goals, Assists, and Points for %s %s", first, last));
 
             String[] titles = { "Player ID", "Season", "Goals", "Assists", "Points" };
-            final int[] SPACINGS = { 11, 12, 8, 9 }; // SPACINGS[[i] is width of i'th column
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSet(rs, titles);
 
-            String[] columns = new String[titles.length];
 
-            while (rs.next()) {
-                for (int i = 1; i <= titles.length; i++) {
-                    columns[i - 1] = rs.getString(i);
-                }
-                printTitles(columns, SPACINGS);
-            }
+            // final int[] SPACINGS = { 11, 12, 8, 9 }; // SPACINGS[[i] is width of i'th column
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
+
+            // String[] columns = new String[titles.length];
+
+            // while (rs.next()) {
+            //     for (int i = 1; i <= titles.length; i++) {
+            //         columns[i - 1] = rs.getString(i);
+            //     }
+            //     printTitles(columns, SPACINGS);
+            // }
 
             rs.close();
             pstmt.close();
@@ -284,16 +268,18 @@ public class HockeyDB {
 
             printBoxedText("Avg. shift length for each play type");
             String[] titles = { "Play Type", "Shift Length" };
-            final int[] SPACINGS = { 12 };
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSet(rs, titles);
 
-            String[] columns = new String[titles.length];
-            while (rs.next()) {
-                columns[0] = rs.getString("playType");
-                columns[1] = getMins(rs.getInt("avgShiftLength"));
-                printTitles(columns, SPACINGS);
-            }
+            // final int[] SPACINGS = { 12 };
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
+
+            // String[] columns = new String[titles.length];
+            // while (rs.next()) {
+            //     columns[0] = rs.getString("playType");
+            //     columns[1] = getMins(rs.getInt("avgShiftLength"));
+            //     printTitles(columns, SPACINGS);
+            // }
 
             rs.close();
             pstmt.close();
@@ -323,16 +309,18 @@ public class HockeyDB {
 
             printBoxedText(String.format("Total goals scored at each venue for the year %s", season));
             String[] titles = { "Venue Name", "Total Goals" };
-            final int[] SPACINGS = { 28 };
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSet(rs, titles);
 
-            String[] columns = new String[titles.length];
-            while (rs.next()) {
-                columns[0] = rs.getString("venueName");
-                columns[1] = rs.getString("numGoals");
-                printTitles(columns, SPACINGS);
-            }
+            // final int[] SPACINGS = { 28 };
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
+
+            // String[] columns = new String[titles.length];
+            // while (rs.next()) {
+            //     columns[0] = rs.getString("venueName");
+            //     columns[1] = rs.getString("numGoals");
+            //     printTitles(columns, SPACINGS);
+            // }
 
             rs.close();
             pstmt.close();
@@ -372,22 +360,25 @@ public class HockeyDB {
             ResultSet rs = pstmt.executeQuery();
 
             printBoxedText(String.format("Top %d officials who call the most penalites against away teams", numRows));
-            String[] titles = { "Rank", "Name", "Penalties Called" };
-            final int[] SPACINGS = { 6, 22, 16 };
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            String[] titles = {"Rank", "Name", "Penalties Called" };
+            TablePrinter.printResultSetWithRank(rs, titles, numRows);
+            
+            
+            // final int[] SPACINGS = { 6, 22, 16 };
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
 
-            String[] columns = new String[titles.length];
-            int rank = 1;
-            while (rs.next() && rank <= numRows) { // FIX: print until rank equals desired numRows
-                columns[0] = "" + rank;
-                // populate each row before printing it
-                for (int i = 1; i < titles.length; i++) {
-                    columns[i] = rs.getString(i);
-                }
-                printTitles(columns, SPACINGS);
-                rank++;
-            }
+            // String[] columns = new String[titles.length];
+            // int rank = 1;
+            // while (rs.next() && rank <= numRows) { // FIX: print until rank equals desired numRows
+            //     columns[0] = "" + rank;
+            //     // populate each row before printing it
+            //     for (int i = 1; i < titles.length; i++) {
+            //         columns[i] = rs.getString(i);
+            //     }
+            //     printTitles(columns, SPACINGS);
+            //     rank++;
+            // }
 
             rs.close();
             pstmt.close();
@@ -416,21 +407,24 @@ public class HockeyDB {
 
             printBoxedText(String.format("Top %d players who have played for the most teams", numRows));
             String[] titles = { "Rank", "First", "Last", "No. Teams" };
-            final int[] SPACINGS = { 6, 16, 15 };
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSetWithRank(rs, titles, numRows);
+            
+            
+            // final int[] SPACINGS = { 6, 16, 15 };
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
 
-            String[] columns = new String[titles.length];
-            int rank = 1;
-            while (rs.next() && rank <= numRows) { // FIX: print until rank equals desired numRows
-                columns[0] = "" + rank;
-                // populate each row before printing it
-                for (int i = 1; i < titles.length; i++) {
-                    columns[i] = rs.getString(i);
-                }
-                printTitles(columns, SPACINGS);
-                rank++;
-            }
+            // String[] columns = new String[titles.length];
+            // int rank = 1;
+            // while (rs.next() && rank <= numRows) { // FIX: print until rank equals desired numRows
+            //     columns[0] = "" + rank;
+            //     // populate each row before printing it
+            //     for (int i = 1; i < titles.length; i++) {
+            //         columns[i] = rs.getString(i);
+            //     }
+            //     printTitles(columns, SPACINGS);
+            //     rank++;
+            // }
 
             rs.close();
             pstmt.close();
@@ -460,21 +454,23 @@ public class HockeyDB {
 
             printBoxedText(String.format("Top %d players who have taken the most penalites", numRows));
             String[] titles = { "Rank", "First", "Last" , "Height", "Weight", "No. Penalties"};
-            final int[] SPACINGS = { 6, 16, 15 , 10, 8};
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSetWithRank(rs, titles, numRows);
 
-            String[] columns = new String[titles.length];
-            int rank = 1;
-            while (rs.next() && rank <= numRows) { // FIX: print until rank equals desired numRows
-                columns[0] = "" + rank;
-                // populate each row before printing it
-                for (int i = 1; i < titles.length; i++) {
-                    columns[i] = rs.getString(i);
-                }
-                printTitles(columns, SPACINGS);
-                rank++;
-            }
+            // final int[] SPACINGS = { 6, 16, 15 , 10, 8};
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
+
+            // String[] columns = new String[titles.length];
+            // int rank = 1;
+            // while (rs.next() && rank <= numRows) { // FIX: print until rank equals desired numRows
+            //     columns[0] = "" + rank;
+            //     // populate each row before printing it
+            //     for (int i = 1; i < titles.length; i++) {
+            //         columns[i] = rs.getString(i);
+            //     }
+            //     printTitles(columns, SPACINGS);
+            //     rank++;
+            // }
 
             rs.close();
             pstmt.close();
@@ -500,16 +496,18 @@ public class HockeyDB {
 
             printBoxedText(String.format("Average shift length by period"));
             String[] titles = { "Period", "Shift Length" };
-            final int[] SPACINGS = { 8, 12 };
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSet(rs, titles);
 
-            String[] columns = new String[titles.length];
-            while (rs.next()) {
-                columns[0] = rs.getString(1);
-                columns[1] = "" + getMins(rs.getInt(2));
-                printTitles(columns, SPACINGS);
-            }
+            // final int[] SPACINGS = { 8, 12 };
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
+
+            // String[] columns = new String[titles.length];
+            // while (rs.next()) {
+            //     columns[0] = rs.getString(1);
+            //     columns[1] = "" + getMins(rs.getInt(2));
+            //     printTitles(columns, SPACINGS);
+            // }
 
             rs.close();
             pstmt.close();
@@ -572,14 +570,15 @@ public class HockeyDB {
             printBoxedText(String.format("Total playoff wins for the %s in the %s season", teamName, season));
 
             String[] titles = { "Wins", "Maximum" };
-            final int[] SPACINGS = { 10 };
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSet(rs, titles);
+            // final int[] SPACINGS = { 10 };
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
 
-            while (rs.next()){
-                String[] columns = { rs.getString(1), rs.getString(2) };
-                printTitles(columns, SPACINGS);
-            }
+            // while (rs.next()){
+            //     String[] columns = { rs.getString(1), rs.getString(2) };
+            //     printTitles(columns, SPACINGS);
+            // }
 
             rs.close();
             pstmt.close();
@@ -622,16 +621,19 @@ public class HockeyDB {
 
             printBoxedText(String.format("Players who have scored against all teams"));
             String[] titles = { "First", "Last" };
-            final int[] SPACINGS = { 16, 15 };
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSet(rs, titles);
+            
+            
+            // final int[] SPACINGS = { 16, 15 };
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
 
-            String[] columns = new String[titles.length];
-            while (rs.next()) {
-                columns[0] = rs.getString(1);
-                columns[1] = rs.getString(2);
-                printTitles(columns, SPACINGS);
-            }
+            // String[] columns = new String[titles.length];
+            // while (rs.next()) {
+            //     columns[0] = rs.getString(1);
+            //     columns[1] = rs.getString(2);
+            //     printTitles(columns, SPACINGS);
+            // }
 
             rs.close();
             pstmt.close();
@@ -688,23 +690,26 @@ public class HockeyDB {
 
             ResultSet rs = pstmt.executeQuery();
 
+            final int NUM_ROWS = 25;
             printBoxedText(String.format("Top 25 Players ordered by %s", getStat(statType)));
             String[] titles = { "Rank", "First", "Last", "Goals", "Assists", "Points", "Plus Minus" };
-            final int[] SPACINGS = { 6, 14, 15, 8, 9, 8 };
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSetWithRank(rs, titles, NUM_ROWS);
+            
+            // final int[] SPACINGS = { 6, 14, 15, 8, 9, 8 };
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
 
-            String[] columns = new String[titles.length];
-            int rank = 1;
-            while (rs.next()) {
-                columns[0] = "" + rank;
-                // populate each row before printing it
-                for (int i = 1; i < titles.length; i++) {
-                    columns[i] = rs.getString(i);
-                }
-                printTitles(columns, SPACINGS);
-                rank++;
-            }
+            // String[] columns = new String[titles.length];
+            // int rank = 1;
+            // while (rs.next()) {
+            //     columns[0] = "" + rank;
+            //     // populate each row before printing it
+            //     for (int i = 1; i < titles.length; i++) {
+            //         columns[i] = rs.getString(i);
+            //     }
+            //     printTitles(columns, SPACINGS);
+            //     rank++;
+            // }
 
             rs.close();
             pstmt.close();
@@ -746,17 +751,19 @@ public class HockeyDB {
 
             printBoxedText(String.format("Players goals per shot average"));
             String[] titles = { "First", "Last", "Goals Per Shot" };
-            final int[] SPACINGS = { 16, 15 };
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSet(rs, titles);
+            
+            // final int[] SPACINGS = { 16, 15 };
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
 
-            String[] columns = new String[titles.length];
-            while (rs.next()) {
-                columns[0] = rs.getString(1);
-                columns[1] = rs.getString(2);
-                columns[2] = rs.getString(3);
-                printTitles(columns, SPACINGS);
-            }
+            // String[] columns = new String[titles.length];
+            // while (rs.next()) {
+            //     columns[0] = rs.getString(1);
+            //     columns[1] = rs.getString(2);
+            //     columns[2] = rs.getString(3);
+            //     printTitles(columns, SPACINGS);
+            // }
 
             rs.close();
             pstmt.close();
@@ -780,17 +787,20 @@ public class HockeyDB {
             printBoxedText("All NHL Teams");
 
             String[] titles = { "ID", "City", "Team Name" };
-            final int[] SPACINGS = { 6, 15 };
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSet(resultSet, titles);
+           
+           
+            // final int[] SPACINGS = { 6, 15 };
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
 
-            String[] columns = new String[titles.length];
-            while (resultSet.next()) {
-                for (int i = 1; i <= columns.length; i++) {
-                    columns[i - 1] = resultSet.getString(i);
-                }
-                printTitles(columns, SPACINGS);
-            }
+            // String[] columns = new String[titles.length];
+            // while (resultSet.next()) {
+            //     for (int i = 1; i <= columns.length; i++) {
+            //         columns[i - 1] = resultSet.getString(i);
+            //     }
+            //     printTitles(columns, SPACINGS);
+            // }
 
             resultSet.close();
             statement.close();
@@ -827,18 +837,19 @@ public class HockeyDB {
                 printBoxedText(String.format("Players with a name matching '%s'", name));
 
                 String[] titles = { "First", "Last", "Player Type", "Nationality", "Date of Birth", "Height", "Weight" };
-                final int[] SPACINGS = { 16, 15, 14, 14, 16, 10 }; // SPACINGS[[i] is width of i'th column
-                printTitles(titles, SPACINGS);
-                printDashes(titles, SPACINGS);
+                TablePrinter.printResultSet(rs, titles);
+                // final int[] SPACINGS = { 16, 15, 14, 14, 16, 10 }; // SPACINGS[[i] is width of i'th column
+                // printTitles(titles, SPACINGS);
+                // printDashes(titles, SPACINGS);
 
-                String[] columns = new String[titles.length];
+                // String[] columns = new String[titles.length];
 
-                while (rs.next()) {
-                    for (int i = 1; i <= titles.length; i++) {
-                        columns[i - 1] = rs.getString(i);
-                    }
-                    printTitles(columns, SPACINGS);
-                }
+                // while (rs.next()) {
+                //     for (int i = 1; i <= titles.length; i++) {
+                //         columns[i - 1] = rs.getString(i);
+                //     }
+                //     printTitles(columns, SPACINGS);
+                // }
             }
 
             rs.close();
@@ -900,14 +911,15 @@ public class HockeyDB {
             printBoxedText(String.format("%s schedule for the %s season", teamName, season));
 
             String[] titles = { "Home Team", "Away Team", "Date", "Time (CST)" };
-            final int[] SPACINGS = { 16, 16, 14 };
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSet(rs, titles);
+            // final int[] SPACINGS = { 16, 16, 14 };
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
 
-            while (rs.next()){
-                String[] columns = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4) };
-                    printTitles(columns, SPACINGS);
-            }
+            // while (rs.next()){
+            //     String[] columns = { rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4) };
+            //         printTitles(columns, SPACINGS);
+            // }
 
             rs.close();
             pstmt.close();
@@ -953,17 +965,19 @@ public class HockeyDB {
 
             printBoxedText(String.format("Players with the most Gordie Howe Hat Tricks"));
             String[] titles = { "First", "Last", "No. Hat Tricks" };
-            final int[] SPACINGS = { 16, 15 };
-            printTitles(titles, SPACINGS);
-            printDashes(titles, SPACINGS);
+            TablePrinter.printResultSet(rs, titles);
 
-            String[] columns = new String[titles.length];
-            while (rs.next()) {
-                columns[0] = rs.getString(1);
-                columns[1] = rs.getString(2);
-                columns[2] = rs.getString(3);
-                printTitles(columns, SPACINGS);
-            }
+            // final int[] SPACINGS = { 16, 15 };
+            // printTitles(titles, SPACINGS);
+            // printDashes(titles, SPACINGS);
+
+            // String[] columns = new String[titles.length];
+            // while (rs.next()) {
+            //     columns[0] = rs.getString(1);
+            //     columns[1] = rs.getString(2);
+            //     columns[2] = rs.getString(3);
+            //     printTitles(columns, SPACINGS);
+            // }
 
             rs.close();
             pstmt.close();

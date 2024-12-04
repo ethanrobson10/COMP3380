@@ -10,3 +10,4 @@ run: DBExample.class
 clean:
 	rm DBExample.class
 	rm HockeyDB.class
+	rm TablePrinter.class
