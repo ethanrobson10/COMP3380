@@ -88,6 +88,7 @@ public class TablePrinter {
 
         int i = 0;
         while (i < maxRows && i < tableData.size()) {
+
             List<String> curRow = tableData.get(i);
 
             for (int j = 0; j < curRow.size(); j++) {
@@ -97,9 +98,6 @@ public class TablePrinter {
             }
             i++;
         }
-
-        // for (int i = 0; i < tableData.size(); i++) {
-        // }
 
         return col_spaces;
     }
