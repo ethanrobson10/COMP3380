@@ -364,7 +364,7 @@ public class HockeyDBInterface {
 					System.out.println("Sorry, integer must be 1 or greater");
 				}
 			} catch(NumberFormatException nfe) {
-				System.out.println("Sorry, '" + n + "' is not a valid integer");
+				System.out.println("Sorry, '" + line + "' is not a valid integer");
 			}
 		}
 
