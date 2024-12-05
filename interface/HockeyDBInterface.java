@@ -18,7 +18,7 @@ public class HockeyDBInterface {
 
 		Scanner console = new Scanner(System.in);
 		welcomeMsg();
-		System.out.print("\nEnter enter a command (h for help) > ");
+		System.out.print("\nEnter a command (h for help) > ");
 		String line = console.nextLine();
 		String[] parts;
 		String arg = "";
@@ -139,7 +139,8 @@ public class HockeyDBInterface {
 
 			// (16) players with the most gordie howe hat tricks
 			else if(parts[0].equals("ghh")) {
-				db.gordieHoweHatTrick();
+				int numRows = getValidInt("players", console); // "refs" is the type we want to list
+				db.gordieHoweHatTrick(numRows);
 			}
 
 			// (10) players who have scored against all teams except their current team
@@ -164,7 +165,7 @@ public class HockeyDBInterface {
 			else
 				System.out.printf("\nSorry, '%s' is an unknown command\n", line);
 
-			System.out.print("\nEnter enter a command (h for help) > ");
+			System.out.print("\nEnter a command (h for help) > ");
 
 			line = console.nextLine();
 		}
@@ -260,11 +261,11 @@ public class HockeyDBInterface {
 		System.out.println("  tpp           |  Displays the top 'numRows' players that have      |  numRows: the number of players to display                  ");	  
 		System.out.println("                |  taken the most penalties                          |                                ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  ghh           |  Displays the top 'numRows' players with the most  |  numRows: the number of players to display                  ");	  
+		System.out.println("                |  Gordie Howe Hat Tricks (goal + assist + penalty)  |                        ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  topNO         |  Displays the top 'numRows' officials that call    |  numRows: the number of officials to display                  ");	  
 		System.out.println("                |  the most penalties against away teams             |                                ");
-		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  ghh           |  Displays players who have had a Gordie Howe Hat   |  none                  ");	  
-		System.out.println("                |  Trick (goal, assist, penalty in one game)         |                        ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  sAll          |  Displays all players who have scored against      |  none                  ");	  
 		System.out.println("                |  all teams (not including their current team)      |                        ");

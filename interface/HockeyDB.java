@@ -758,7 +758,7 @@ public class HockeyDB {
     }
 
     // (16)
-    public void gordieHoweHatTrick() {
+    public void gordieHoweHatTrick(int numRows) {
         try {
 
             String sql = """
@@ -791,9 +791,9 @@ public class HockeyDB {
             PreparedStatement pstmt = connection.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
 
-            printBoxedText(String.format("Players with the most Gordie Howe Hat Tricks"));
-            String[] titles = { "First", "Last", "No. Hat Tricks" };
-            TablePrinter.printResultSet(rs, titles);
+            printBoxedText(String.format("Top %d players with the most Gordie Howe Hat Tricks", numRows));
+            String[] titles = { "Rank", "First", "Last", "No. Hat Tricks" };
+            TablePrinter.printResultSetWithRank(rs, titles, numRows);
 
             rs.close();
             pstmt.close();
