@@ -1,5 +1,4 @@
-# COMP 3380 Project
-## NHL Database
+# COMP 3380 Project - NHL Database
 
 ## Running Program
 1. Navigate to the interface directory:
