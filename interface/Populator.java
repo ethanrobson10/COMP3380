@@ -31,15 +31,15 @@ public class Populator {
 
                 queryBuilder.append(line).append(" ");
 
-                // if the line ends with a semicolon then execute the query
+                // build up query
                 if (line.endsWith(";")) {
                     String query = queryBuilder.toString().trim();
-                    queryBuilder.setLength(0); // Reset the builder
+                    queryBuilder.setLength(0); 
 
                     statement.addBatch(query);
                     batchCount++;
 
-                    // Execute batch if it reaches a threshold
+                    // optimal batch size according to oracle
                     if (batchCount >= 50) {
                         statement.executeBatch();
                         batchCount = 0;
@@ -48,12 +48,12 @@ public class Populator {
                 }
             }
 
-            // Execute remaining queries in the batch
+            // remaining queries in the batch
             if (batchCount > 0) {
                 statement.executeBatch();
             }
 
-            connection.commit(); // Commit transaction
+            connection.commit(); 
 
             reader.close();
         } catch (IOException e) {

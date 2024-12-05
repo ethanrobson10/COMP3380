@@ -76,7 +76,7 @@ public class HockeyDB {
 
         final int NUM_CHUNKS = 36;
 
-        printBoxedText("Repopulating Database - Estimated Time: 5-15 minutes.");
+        printBoxedText("Repopulating Database - Estimated Time: 10-30 minutes.");
 
         for (int i = 1; i <= NUM_CHUNKS; i++) {
 
