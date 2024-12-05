@@ -161,6 +161,10 @@ public class HockeyDBInterface {
 			else if (parts[0].equals("REPOP")) {
 				db.repopulate();
 			}
+
+			else if (parts[0].equals("DELETE")) {
+				db.removeAll();
+			}
 			
 			else
 				System.out.printf("\nSorry, '%s' is an unknown command\n", line);
@@ -228,6 +232,9 @@ public class HockeyDBInterface {
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  REPOP         |  repopulates the database                          |  none       ");
 		System.out.println("                |  WARNING: This process can take approx. 10-30 mins |           ");	  
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  DELETE        |  delete the entire database                        |  none       ");
+		System.out.println("                |                                                    |           ");	  
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  teams         |  displays all teams in the NHL                     |  none");	  
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");

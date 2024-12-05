@@ -76,16 +76,40 @@ public class HockeyDB {
 
         final int NUM_CHUNKS = 36;
 
-        System.out.println("Repopulating DB. Approx Time: 20-30 minutes.");
+        printBoxedText("Repopulating DB. Approx Time: 20-30 minutes.");
+
         for (int i = 1; i <= NUM_CHUNKS; i++) {
 
             String file_name = String.format("sql_chunk_%s.sql", i);
             System.out.printf("Starting execution of sql chunk %d of %d...\n", i, NUM_CHUNKS);
             Populator.repopulateDB(connection, file_name);
-            System.out.printf("Chunk %d executed successfully!\n", i);
+            System.out.printf("Chunk %d done.\n", i);
 
         }
+    }
 
+    public void removeAll() {
+        printBoxedText("Deleting the Database...");
+        try {
+            String sql = """
+                        DROP TABLE IF EXISTS assists;
+                        DROP TABLE IF EXISTS plays;
+                        DROP TABLE IF EXISTS shifts;
+                        DROP TABLE IF EXISTS officiatedBy;
+                        DROP TABLE IF EXISTS playsIn;
+                        DROP TABLE IF EXISTS games;
+                        DROP TABLE IF EXISTS venues;
+                        DROP TABLE IF EXISTS playsOn;
+                        DROP TABLE IF EXISTS teams; 
+                        DROP TABLE IF EXISTS players;
+                        DROP TABLE IF EXISTS officials;
+                    """;
+                PreparedStatement pstmt = connection.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery();
+                rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace(System.out);
+        }
     }
 
     public void example() {
