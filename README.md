@@ -12,5 +12,10 @@
   ``` 
 
 ## Populating Database
-- The database has already been populated by executing the populate.SQL file
-- Repopulating database is possible through the main interface by typing the 'repop' command
+- The database has already been populated by executing the 36 SQL file 'chunks' in the sql_chunks directory
+  (we separated the inserts for better efficiency).
+- Repopulating the database is possible through the main interface by using the 'REPOP' command.
+
+## Additional Info
+- Our project connects to Drea's uranium account. The userid and password are stored in the data directory in the auth.cfg file.
+  
