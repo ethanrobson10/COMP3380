@@ -90,7 +90,9 @@ public class HockeyDB {
 
     public void removeAll() {
         printBoxedText("Deleting the Database...");
+        int n = -1;
         try {
+            
             String sql = """
                         DROP TABLE IF EXISTS assists;
                         DROP TABLE IF EXISTS plays;
@@ -105,9 +107,14 @@ public class HockeyDB {
                         DROP TABLE IF EXISTS officials;
                     """;
                 PreparedStatement pstmt = connection.prepareStatement(sql);
-                pstmt.executeQuery();
-        } catch (SQLException e) {
+                n = pstmt.executeUpdate();
+        
+            } catch (SQLException e) {
             e.printStackTrace(System.out);
+        }
+
+        if (n == 0) {
+            printBoxedText("Database deleted successfully!");
         }
     }
 
