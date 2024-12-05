@@ -76,7 +76,7 @@ public class HockeyDB {
 
         final int NUM_CHUNKS = 36;
 
-        printBoxedText("Repopulating DB. Approx Time: 20-30 minutes.");
+        printBoxedText("Repopulating Database - Estimated Time: 5-15 minutes.");
 
         for (int i = 1; i <= NUM_CHUNKS; i++) {
 
@@ -105,8 +105,7 @@ public class HockeyDB {
                         DROP TABLE IF EXISTS officials;
                     """;
                 PreparedStatement pstmt = connection.prepareStatement(sql);
-                ResultSet rs = pstmt.executeQuery();
-                rs.close();
+                pstmt.executeQuery();
         } catch (SQLException e) {
             e.printStackTrace(System.out);
         }

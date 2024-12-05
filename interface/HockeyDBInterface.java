@@ -231,7 +231,7 @@ public class HockeyDBInterface {
 		System.out.println("                |  inputs to find a player and get their statistics  |                   ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  REPOP         |  repopulates the database                          |  none       ");
-		System.out.println("                |  WARNING: This process can take approx. 10-30 mins |           ");	  
+		System.out.println("                |  (process may take up to 25 mins, usually faster)  |           ");	  
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  DELETE        |  delete the entire database                        |  none       ");
 		System.out.println("                |                                                    |           ");	  
@@ -286,7 +286,7 @@ public class HockeyDBInterface {
 	}
 
 	public static void printTerms() {
-				System.out.println("=========== TERMINOLOGY ====================================================================");
+		System.out.println("=========== TERMINOLOGY ====================================================================");
         System.out.println("      TERM      |        DEFINITION                                                        ");
         System.out.println("----------------+---------------------------------------------------------------------------");
         System.out.println("  goal          | awarded to a player who scores on the opposing team's goalie           ");
