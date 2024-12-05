@@ -11,3 +11,4 @@ clean:
 	rm HockeyDBInterface.class
 	rm HockeyDB.class
 	rm TablePrinter.class
+	rm Populator.class

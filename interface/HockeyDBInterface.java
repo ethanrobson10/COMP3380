@@ -10,7 +10,7 @@ public class HockeyDBInterface {
 		HockeyDB db = new HockeyDB();
 		runConsole(db);
 		
-		System.out.println("\nThank You for using the NHL database!\n");
+		System.out.println("\nThank you for using the NHL database!\n");
 	}
 
 
@@ -18,7 +18,7 @@ public class HockeyDBInterface {
 
 		Scanner console = new Scanner(System.in);
 		welcomeMsg();
-		System.out.print("\nTo see available commands type h.\n\nPlease enter a command > ");
+		System.out.print("\nEnter enter a command (h for help) > ");
 		String line = console.nextLine();
 		String[] parts;
 		String arg = "";
@@ -156,11 +156,15 @@ public class HockeyDBInterface {
 			else if (parts[0].equals("asl")) {
 				db.avgShiftByPlay();
 			}
+
+			else if (parts[0].equals("REPOP")) {
+				db.repopulate();
+			}
 			
 			else
-				System.out.println("Unknown command, type h for the help menu.");
+				System.out.printf("\nSorry, '%s' is an unknown command\n", line);
 
-			System.out.print("\n\nTo see available commands type h.\n\nPlease enter a command > ");
+			System.out.print("\nEnter enter a command (h for help) > ");
 
 			line = console.nextLine();
 		}
@@ -220,6 +224,9 @@ public class HockeyDBInterface {
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  ex            |  (For new users) Displays an example of user       |  none             ");
 		System.out.println("                |  inputs to find a player and get their statistics  |                   ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  REPOP         |  repopulates the database                          |  none       ");
+		System.out.println("                |  WARNING: This process can take approx. 10-30 mins |           ");	  
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  teams         |  displays all teams in the NHL                     |  none");	  
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");

@@ -72,6 +72,22 @@ public class HockeyDB {
 
     }
 
+    public void repopulate() {
+
+        final int NUM_CHUNKS = 36;
+
+        System.out.println("Repopulating DB. Approx Time: 20-30 minutes.");
+        for (int i = 1; i <= NUM_CHUNKS; i++) {
+
+            String file_name = String.format("sql_chunk_%s.sql", i);
+            System.out.printf("Starting execution of sql chunk %d of %d...\n", i, NUM_CHUNKS);
+            Populator.repopulateDB(connection, file_name);
+            System.out.printf("Chunk %d executed successfully!\n", i);
+
+        }
+
+    }
+
     public void example() {
         String steps = """
                     Try the following examples set of commands to get started!

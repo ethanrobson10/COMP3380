@@ -136,16 +136,16 @@ CREATE TABLE shifts (
 );
 
 CREATE TABLE plays(
-    playID varchar(30) PRIMARY KEY, -- create our own playID to make integer
-    playerID INT, -- FK
-    gameID INT, -- FK
-    shiftID INT, -- FK
+    playID varchar(30) PRIMARY KEY, 
+    playerID INT, 
+    gameID INT, 
+    shiftID INT, 
     periodNumber INT,
     periodType varchar(15),
     periodTime INT, 
     playType varchar(15), 
          CHECK (playType IN ('Shot', 'Goal', 'Penalty')),
-    secondaryType varchar(60), -- long descriptions for penalties
+    secondaryType varchar(60), 
     goalieID INT,
 
     
@@ -499,17 +499,6 @@ def split_chunks(sql_str, max_lines=50000):
         chunks.append("\n".join(current_chunk))
 
     return chunks
-  
-def create_meta_script(curr_directory, idx):
-  
-  BATCH_SIZE = 8 # number of SQL files to execute at once
-  with open(f"sql_meta_insert.sql", "w") as file:
-  
-  # NOTE 
-    for i in range(1, idx+1):
-      if (i > 1 and i%(BATCH_SIZE) == 0):
-        file.write("\n") # seperate batches 
-      file.write("--:r "+curr_directory+f"\sql_chunk_{i}.sql\n")
 
 # create all pandas dataframes and create corresponding insert statements 
 # all_inserts is a string with all inserts for all tables
@@ -569,17 +558,15 @@ def main():
   if not os.path.exists(final_directory):
     os.makedirs(final_directory)
   
+  # write chunks (i.e., sql files with 50,000 lines each) to chunks folder
   MAX_LINES = 50000
   chunks = split_chunks(SQL_CREATE_TABLES + all_inserts, max_lines=MAX_LINES)
   for idx, chunk in enumerate(chunks, start=1):
-      with open(f"sql_chunks\sql_chunk_{idx}.sql", "w") as file:
+      with open(f"sql_chunks/sql_chunk_{idx}.sql", "w") as file:
+          file.write("SET NOCOUNT ON;\n")
           file.write(chunk)
           print(f"chunk_{idx}.sql created")
   
   print("\nSQL chunks created successfully")
   
-  create_meta_script(current_directory+"\sql_chunks", idx)
-  print("\nSQL meta file created successfully")
-
-
 main()
