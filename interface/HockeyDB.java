@@ -76,7 +76,7 @@ public class HockeyDB {
 
         final int NUM_CHUNKS = 36;
 
-        printBoxedText("Repopulating DB. Approx Time: 20-30 minutes.");
+        printBoxedText("Repopulating Database - Estimated Time: 10-30 minutes.");
 
         for (int i = 1; i <= NUM_CHUNKS; i++) {
 
@@ -90,7 +90,9 @@ public class HockeyDB {
 
     public void removeAll() {
         printBoxedText("Deleting the Database...");
+        int n = -1;
         try {
+            
             String sql = """
                         DROP TABLE IF EXISTS assists;
                         DROP TABLE IF EXISTS plays;
@@ -105,10 +107,14 @@ public class HockeyDB {
                         DROP TABLE IF EXISTS officials;
                     """;
                 PreparedStatement pstmt = connection.prepareStatement(sql);
-                ResultSet rs = pstmt.executeQuery();
-                rs.close();
-        } catch (SQLException e) {
+                n = pstmt.executeUpdate();
+        
+            } catch (SQLException e) {
             e.printStackTrace(System.out);
+        }
+
+        if (n == 0) {
+            printBoxedText("Database deleted successfully!");
         }
     }
 
