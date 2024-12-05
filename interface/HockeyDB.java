@@ -565,7 +565,12 @@ public class HockeyDB {
     }
 
     // (12)
-    public void goalsPerShotAllPlayers() {
+    public void goalsPerShotAllPlayers(String first, String last) {
+
+        if (!playerExists(first, last)) {
+            return;
+        }
+
         try {
 
             String sql = """
@@ -585,17 +590,20 @@ public class HockeyDB {
                             GROUP BY players.playerID, firstname, lastname 
                         )  
                             
-                        SELECT firstName, lastName, (CAST(goals AS REAL) / shots) AS goals_per_shot_average  
+                        SELECT firstName, lastName, ROUND((CAST(goals AS REAL) / shots), 4) AS goals_per_shot_average  
                         FROM playerGoals  
                         JOIN playerShots ON playerGoals.playerID = playerShots.playerID  
-                        ORDER BY goals_per_shot_average DESC;
+                        WHERE firstName = ? And lastName = ?;
                     """;
 
 
             PreparedStatement pstmt = connection.prepareStatement(sql);
+            pstmt.setString(1, first);
+            pstmt.setString(2, last);
+
             ResultSet rs = pstmt.executeQuery();
 
-            printBoxedText(String.format("Players goals per shot average"));
+            printBoxedText(String.format("Career goals per shot average for %s %s", first, last));
             String[] titles = { "First", "Last", "Goals Per Shot" };
             TablePrinter.printResultSet(rs, titles);
 

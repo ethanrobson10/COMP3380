@@ -18,7 +18,7 @@ public class HockeyDBInterface {
 
 		Scanner console = new Scanner(System.in);
 		welcomeMsg();
-		System.out.print("NHL Database > ");
+		System.out.print("\nTo see available commands type h.\n\nPlease enter a command > ");
 		String line = console.nextLine();
 		String[] parts;
 		String arg = "";
@@ -132,7 +132,9 @@ public class HockeyDBInterface {
 
 			// (12) goals per shot for all players, descending order
 			else if(parts[0].equals("gps")) {
-				db.goalsPerShotAllPlayers();
+				String firstName = getTextInput(console, "\nEnter the players first name: " );
+				String lastName = getTextInput(console, "\nEnter the players last name: " );
+				db.goalsPerShotAllPlayers(firstName, lastName);
 			}
 
 			// (16) players with the most gordie howe hat tricks
@@ -158,7 +160,8 @@ public class HockeyDBInterface {
 			else
 				System.out.println("Unknown command, type h for the help menu.");
 
-			System.out.print("\nNHL Database > ");
+			System.out.print("\n\nTo see available commands type h.\n\nPlease enter a command > ");
+
 			line = console.nextLine();
 		}
 
@@ -173,9 +176,7 @@ public class HockeyDBInterface {
         String msg = """
 
                 Explore detailed statistics of your favourite players and even referees!
-                The database covers seasons from 2018-2020.
-
-                Type h for the help menu.
+                The database covers seasons from 2012-2020.
                 """;
         System.out.println(msg);
     }
@@ -231,6 +232,9 @@ public class HockeyDBInterface {
 		System.out.println("  tgbt          |  Displays total goals scored against each team     |  first: first name of the player                              ");	  
 		System.out.println("                |  for a chosen player                               |  last: last name of the player                                ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
+		System.out.println("  gps           |  Displays a player's goals per shot percentage     |  first: first name of the player                              ");	  
+		System.out.println("                |  across their entire career                        |  last: last name of the player                                ");
+		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  top25         |  Displays the top 25 players determined by your    |  statistic: 'g'=goals, 'a'=assists, 'p'=points, '+'=plus-minus");
 		System.out.println("                |  desired statistic, for a particular season        |  season: regular season to calculate the top player statistics");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
@@ -251,9 +255,6 @@ public class HockeyDBInterface {
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  topNO         |  Displays the top 'numRows' officials that call    |  numRows: the number of officials to display                  ");	  
 		System.out.println("                |  the most penalties against away teams             |                                ");
-		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
-		System.out.println("  gps           |  Displays all players and their goals per shot     |  none                  ");	  
-		System.out.println("                |  across their entire career (in descending order)  |                        ");
 		System.out.println("----------------+----------------------------------------------------+---------------------------------------------------------------");
 		System.out.println("  ghh           |  Displays players who have had a Gordie Howe Hat   |  none                  ");	  
 		System.out.println("                |  Trick (goal, assist, penalty in one game)         |                        ");
