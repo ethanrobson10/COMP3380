@@ -19,4 +19,17 @@
 ## Additional Info
 - Our project connects to Drea's uranium account. The userid and password are stored in the data directory in the auth.cfg file.
 - username: esposita
-- password: 7874482  
+- password: 7874482
+
+### Folder Reference
+```bash
+Group54_Submission
+│
+├───data (contains .csv files and auth.cfg)
+│
+├───interface interface (files to run the interface)
+│  
+└───populate_data (files to create SQL inserts from .csv data)
+    │
+    └───sql_chunks (contains each SQL chunk)
+```
