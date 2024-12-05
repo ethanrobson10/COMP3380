@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-PATH = '../../data/'
+PATH = '../data/'
 team_info = PATH + "team_info.csv"
 game = PATH + "game.csv"
 player_info = PATH + "player_info.csv"

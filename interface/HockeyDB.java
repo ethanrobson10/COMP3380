@@ -34,7 +34,7 @@ public class HockeyDB {
 
     public HockeyDB() {
         Properties prop = new Properties();
-        String fileName = "../../data/auth.cfg";
+        String fileName = "../data/auth.cfg";
         try {
             FileInputStream configFile = new FileInputStream(fileName);
             prop.load(configFile);
