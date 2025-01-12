@@ -17,9 +17,8 @@
 - Our insertions are broken into 36 SQL file 'chunks' of 50,000 lines each (in the sql_chunks directory) for insertion efficiency.
 
 ## Additional Info
-- Our project connects to Drea's Uranium account. The userid and password are stored in the data directory in the auth.cfg file.
-- username: esposita
-- password: 7874482
+- The userid and password are stored in the data directory in the auth.cfg file.
+
 
 ### Folder Reference
 ```bash
