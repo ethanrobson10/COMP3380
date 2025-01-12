@@ -33,3 +33,4 @@ Group54_Submission
     │
     └───sql_chunks (contains each SQL chunk)
 ```
+*Note: the data folder is not present in GitHub repository due to large file size*
