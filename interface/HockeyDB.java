@@ -54,17 +54,14 @@ public class HockeyDB {
             System.exit(1);
         }
 
-        String connectionUrl = "jdbc:sqlserver://uranium.cs.umanitoba.ca:1433;"
-                + "database=cs3380;"
-                + "user=" + username + ";"
-                + "password=" + password + ";"
-                + "encrypt=false;"
-                + "trustServerCertificate=false;"
-                + "loginTimeout=30;";
+        String connectionUrl = "jdbc:postgresql://aws-0-ca-central-1.pooler.supabase.com:6543/postgres"
+                                + "?user=" + username
+                                + "&password=" + password;
 
         try {
             // create a connection to the database
             connection = DriverManager.getConnection(connectionUrl);
+            System.out.println("Connection to Supabase was successful");
 
         } catch (SQLException e) {
             e.printStackTrace(System.out);
@@ -74,7 +71,7 @@ public class HockeyDB {
 
     public void repopulate() {
 
-        final int NUM_CHUNKS = 36;
+        final int NUM_CHUNKS = 35;
 
         printBoxedText("Repopulating Database - Estimated Time: 10-30 minutes.");
 

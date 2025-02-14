@@ -5,7 +5,7 @@ HockeyDBInterface.class: HockeyDBInterface.java
 	javac HockeyDBInterface.java
 
 run: HockeyDBInterface.class
-	java -cp .:mssql-jdbc-11.2.0.jre11.jar HockeyDBInterface
+	java -cp .:postgresql-42.7.5.jar HockeyDBInterface
 
 clean:
 	rm HockeyDBInterface.class

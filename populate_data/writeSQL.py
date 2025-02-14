@@ -17,10 +17,6 @@ FIRST_SEASON = "2012"
 # string to drop and create tables before inserting data
 SQL_CREATE_TABLES = """
 
-USE cs3380;
-
-SET NOCOUNT ON;
-
 DROP TABLE IF EXISTS assists;
 DROP TABLE IF EXISTS plays;
 DROP TABLE IF EXISTS shifts;
@@ -45,13 +41,13 @@ CREATE TABLE venues (
   teamID INT,
 
   FOREIGN KEY (teamID) REFERENCES teams (teamID)
-    ON DELETE NO ACTION,
+    ON DELETE NO ACTION
 );
 
 CREATE TABLE games (
   gameID INT PRIMARY KEY,
   type varchar(10) NOT NULL,
-  dateTime DATETIME NOT NULL,
+  dateTime TIMESTAMP NOT NULL,
   outcome varchar(30) NOT NULL,
   season varchar(15) NOT NULL,
   homeTeamID INT,
@@ -462,7 +458,7 @@ def create_inserts(df, table_name):
     individual_inserts.append(f"{insert_string}({values});\n")
 
   insert_string = "\n\n" + "".join(individual_inserts) # all insert statements for given table separated by newline characters
-  insert_string += f"\nPRINT('Table: {table_name} done inserting')\n"
+  #insert_string += f"\nPRINT('Table: {table_name} done inserting')\n"
   
   return insert_string
 
@@ -563,7 +559,7 @@ def main():
   chunks = split_chunks(SQL_CREATE_TABLES + all_inserts, max_lines=MAX_LINES)
   for idx, chunk in enumerate(chunks, start=1):
       with open(f"sql_chunks/sql_chunk_{idx}.sql", "w") as file:
-          file.write("SET NOCOUNT ON;\n")
+          #file.write("SET NOCOUNT ON;\n")
           file.write(chunk)
           print(f"chunk_{idx}.sql created")
   
