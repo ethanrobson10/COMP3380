@@ -54,7 +54,7 @@ public class HockeyDB {
             System.exit(1);
         }
 
-        String connectionUrl = "jdbc:postgresql://aws-0-ca-central-1.pooler.supabase.com:6543/postgres"
+        String connectionUrl = "jdbc:postgresql://db.wfewvmiqembsglbeniya.supabase.co:5432/postgres"
                                 + "?user=" + username
                                 + "&password=" + password;
 
