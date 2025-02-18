@@ -1,22 +1,3 @@
-SET NOCOUNT ON;
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021045, 84, 'Referee');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021045, 63, 'Linesman');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021045, 44, 'Linesman');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2015020402, 9, 'Referee');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2015020402, 87, 'Referee');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2015020402, 40, 'Linesman');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2015020402, 52, 'Linesman');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020479, 62, 'Referee');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020479, 50, 'Referee');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020479, 65, 'Linesman');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020479, 23, 'Linesman');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020960, 36, 'Referee');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020960, 61, 'Referee');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020960, 23, 'Linesman');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020960, 7, 'Linesman');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021111, 25, 'Referee');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021111, 50, 'Referee');
-INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021111, 19, 'Linesman');
 INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021111, 4, 'Linesman');
 INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2017021071, 9, 'Referee');
 INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2017021071, 5, 'Referee');
@@ -39270,8 +39251,6 @@ INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2018030417, 
 INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2018030417, 14, 'Linesman');
 INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2018030417, 65, 'Linesman');
 
-PRINT('Table: officiatedBy done inserting')
-
 
 INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2016020045, 8473573, 5690428, 1, 27, 56);
 INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2016020045, 8474141, 5690432, 1, 27, 56);
@@ -49999,3 +49978,23 @@ INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEn
 INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8476480, 5264453, 3, 534, 583);
 INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8475167, 5264337, 3, 570, 613);
 INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8470110, 5264716, 3, 585, 678);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8475810, 5264195, 3, 678, 712);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8474102, 5264259, 3, 747, 786);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8476874, 5264440, 3, 815, 863);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8470543, 5263934, 3, 815, 828);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8474102, 5264212, 3, 828, 863);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8475832, 5264131, 3, 863, 891);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8471873, 5264345, 3, 878, 921);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8470611, 5263913, 3, 1007, 1015);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8475167, 5264536, 3, 1093, 1147);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8475208, 5264205, 3, 1088, 1122);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8471215, 5264288, 4, 0, 41);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8471887, 5264463, 4, 81, 131);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8476453, 5264249, 4, 93, 131);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2015020657, 8476480, 5264250, 4, 93, 131);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2017020161, 8474613, 5035173, 1, 0, 36);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2017020161, 8474625, 5035392, 1, 72, 122);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2017020161, 8475171, 5035180, 1, 145, 181);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2017020161, 8470755, 5035262, 1, 202, 244);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2017020161, 8477425, 5035480, 1, 330, 386);
+INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2017020161, 8477463, 5034998, 1, 369, 393);

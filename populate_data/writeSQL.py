@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 
-PATH = '../data/'
+PATH = '../../data/'
 team_info = PATH + "team_info.csv"
 game = PATH + "game.csv"
 player_info = PATH + "player_info.csv"
@@ -559,7 +559,6 @@ def main():
   chunks = split_chunks(SQL_CREATE_TABLES + all_inserts, max_lines=MAX_LINES)
   for idx, chunk in enumerate(chunks, start=1):
       with open(f"sql_chunks/sql_chunk_{idx}.sql", "w") as file:
-          #file.write("SET NOCOUNT ON;\n")
           file.write(chunk)
           print(f"chunk_{idx}.sql created")
   

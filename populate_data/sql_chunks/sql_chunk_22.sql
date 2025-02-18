@@ -1,24 +1,3 @@
-SET NOCOUNT ON;
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8470613, 1040085, 3, 89, 127);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8475768, 1040573, 3, 176, 228);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8474102, 1040254, 3, 225, 276);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8474053, 1040225, 3, 408, 413);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8480023, 1040899, 3, 515, 533);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8474053, 1040227, 3, 533, 573);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8470613, 1040090, 3, 533, 628);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8478104, 1040849, 3, 613, 642);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8475768, 1040576, 3, 642, 686);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8474053, 1040228, 3, 647, 691);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8476892, 1040726, 3, 698, 746);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8478104, 1040850, 3, 686, 746);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8474578, 1040363, 3, 865, 907);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8470613, 1040093, 3, 876, 980);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8470257, 1040059, 3, 896, 941);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8475170, 1040501, 3, 949, 999);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8475765, 1040550, 3, 941, 980);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8474578, 1040365, 3, 1028, 1064);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8477964, 1040810, 3, 1053, 1064);
-INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8470613, 1040094, 3, 1028, 1139);
 INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8470794, 1040124, 3, 1114, 1139);
 INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8474053, 1040231, 3, 1064, 1139);
 INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030323, 8470257, 1040062, 4, 29, 82);
@@ -659,8 +638,6 @@ INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEn
 INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030417, 8475158, 1049726, 3, 949, 955);
 INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030417, 8475149, 1049700, 3, 1002, 1010);
 INSERT INTO shifts (gameID, playerID, shiftID, periodNumber, shiftStart, shiftEnd) VALUES (2018030417, 8476891, 1049951, 3, 1059, 1126);
-
-PRINT('Table: shifts done inserting')
 
 
 INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2016020045_5', 8473573, 2016020045, 5690428, 1, 'REGULAR', 54, 'Shot', 'Wrist Shot', 8473607);
@@ -49999,3 +49976,25 @@ INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, 
 INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_260', 8471699, 2015020774, 2803087, 3, 'REGULAR', 228, 'Goal', 'Tip-In', 8474765);
 INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_262', 8462038, 2015020774, 2802612, 3, 'REGULAR', 235, 'Shot', 'Slap Shot', 8475883);
 INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_266', 8474628, 2015020774, 2802681, 3, 'REGULAR', 280, 'Shot', 'Wrist Shot', 8475883);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_271', 8470755, 2015020774, 2802493, 3, 'REGULAR', 341, 'Penalty', 'Tripping', NULL);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_278', 8471691, 2015020774, 2802463, 3, 'REGULAR', 479, 'Penalty', 'Cross checking', NULL);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_281', 8476116, 2015020774, 2803170, 3, 'REGULAR', 493, 'Shot', 'Wrist Shot', 8474765);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_282', 8475764, 2015020774, 2803035, 3, 'REGULAR', 512, 'Shot', 'Slap Shot', 8474765);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_286', 8474034, 2015020774, 2802538, 3, 'REGULAR', 545, 'Shot', 'Tip-In', 8474765);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_300', 8476921, 2015020774, 2803105, 3, 'REGULAR', 755, 'Shot', 'Backhand', 8475883);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_304', 8470616, 2015020774, 2802640, 3, 'REGULAR', 809, 'Shot', 'Slap Shot', 8474765);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_306', 8475171, 2015020774, 2803252, 3, 'REGULAR', 830, 'Shot', 'Slap Shot', 8475883);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_317', 8471691, 2015020774, 2802476, 3, 'REGULAR', 894, 'Penalty', 'Slashing', NULL);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_319', 8470612, 2015020774, 2803257, 3, 'REGULAR', 904, 'Shot', 'Wrist Shot', 8474765);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_323', 8470755, 2015020774, 2803013, 3, 'REGULAR', 947, 'Shot', 'Slap Shot', 8475883);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_328', 8474034, 2015020774, 2802600, 3, 'REGULAR', 985, 'Goal', 'Tip-In', 8474765);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_333', 8475764, 2015020774, 2803202, 3, 'REGULAR', 1045, 'Shot', 'Wrist Shot', 8474765);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_346', 8474102, 2015020774, 2802852, 3, 'REGULAR', 1125, 'Shot', 'Wrist Shot', 8474765);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020774_353', 8475246, 2015020774, 2803005, 3, 'REGULAR', 1172, 'Shot', 'Slap Shot', 8475883);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020484_11', 8474125, 2015020484, 7556319, 1, 'REGULAR', 77, 'Shot', 'Wrist Shot', 8471403);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020484_13', 8475765, 2015020484, 7556360, 1, 'REGULAR', 83, 'Goal', 'Backhand', 8471403);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020484_15', 8474031, 2015020484, 7556828, 1, 'REGULAR', 90, 'Shot', 'Wrist Shot', 8471403);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020484_18', 8477591, 2015020484, 7556346, 1, 'REGULAR', 145, 'Shot', 'Wrist Shot', 8470880);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020484_27', 8476892, 2015020484, 7556290, 1, 'REGULAR', 227, 'Goal', 'Backhand', 8471403);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020484_29', 8471817, 2015020484, 7556219, 1, 'REGULAR', 230, 'Penalty', 'Fighting', NULL);
+INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2015020484_30', 8468674, 2015020484, 7556216, 1, 'REGULAR', 230, 'Penalty', 'Fighting', NULL);

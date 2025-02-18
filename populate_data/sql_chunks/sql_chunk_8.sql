@@ -1,16 +1,3 @@
-SET NOCOUNT ON;
-INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8475170, 0, NULL);
-INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8475195, NULL, 86.1111111111111);
-INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8475753, -2, NULL);
-INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8475765, -1, NULL);
-INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8475768, -1, NULL);
-INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8476331, 0, NULL);
-INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8476419, 0, NULL);
-INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8476480, -1, NULL);
-INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8476892, 1, NULL);
-INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8476897, 0, NULL);
-INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8476919, -1, NULL);
-INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8477015, 0, NULL);
 INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8477149, 1, NULL);
 INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8477407, -1, NULL);
 INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019020051, 8477482, 0, NULL);
@@ -44294,8 +44281,6 @@ INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (201903
 INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019030416, 8480186, 0, NULL);
 INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2019030416, 8481641, 0, NULL);
 
-PRINT('Table: playsIn done inserting')
-
 
 INSERT INTO playsOn (teamID, playerID, startDate, endDate) VALUES (22, 8468513, '2012-09-01', '2014-03-07');
 INSERT INTO playsOn (teamID, playerID, startDate, endDate) VALUES (29, 8468513, '2014-03-07', '2014-10-09');
@@ -48113,8 +48098,6 @@ INSERT INTO playsOn (teamID, playerID, startDate, endDate) VALUES (24, 8479294, 
 INSERT INTO playsOn (teamID, playerID, startDate, endDate) VALUES (9, 8478916, '2012-09-01', NULL);
 INSERT INTO playsOn (teamID, playerID, startDate, endDate) VALUES (17, 8480363, '2012-09-01', NULL);
 
-PRINT('Table: playsOn done inserting')
-
 
 INSERT INTO officials (officialName, officialID) VALUES ('Dan O''Rourke', 1);
 INSERT INTO officials (officialName, officialID) VALUES ('Trevor Hanson', 2);
@@ -48302,8 +48285,6 @@ INSERT INTO officials (officialName, officialID) VALUES ('Conor O''Donnell', 183
 INSERT INTO officials (officialName, officialID) VALUES ('Justin St. Pierre', 184);
 INSERT INTO officials (officialName, officialID) VALUES ('Francois St. Laurent', 185);
 INSERT INTO officials (officialName, officialID) VALUES ('Beau Halkidis', 186);
-
-PRINT('Table: officials done inserting')
 
 
 INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020045, 1, 'Referee');
@@ -49999,3 +49980,21 @@ INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020592, 
 INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020592, 65, 'Linesman');
 INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020592, 51, 'Linesman');
 INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021045, 29, 'Referee');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021045, 84, 'Referee');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021045, 63, 'Linesman');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021045, 44, 'Linesman');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2015020402, 9, 'Referee');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2015020402, 87, 'Referee');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2015020402, 40, 'Linesman');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2015020402, 52, 'Linesman');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020479, 62, 'Referee');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020479, 50, 'Referee');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020479, 65, 'Linesman');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020479, 23, 'Linesman');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020960, 36, 'Referee');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020960, 61, 'Referee');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020960, 23, 'Linesman');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016020960, 7, 'Linesman');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021111, 25, 'Referee');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021111, 50, 'Referee');
+INSERT INTO officiatedBy (gameID, officialID, officialType) VALUES (2016021111, 19, 'Linesman');

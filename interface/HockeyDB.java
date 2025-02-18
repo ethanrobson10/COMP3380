@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -34,7 +35,7 @@ public class HockeyDB {
 
     public HockeyDB() {
         Properties prop = new Properties();
-        String fileName = "../data/auth.cfg";
+        String fileName = "../../data/auth.cfg";
         try {
             FileInputStream configFile = new FileInputStream(fileName);
             prop.load(configFile);
@@ -54,9 +55,9 @@ public class HockeyDB {
             System.exit(1);
         }
 
-        String connectionUrl = "jdbc:postgresql://db.wfewvmiqembsglbeniya.supabase.co:5432/postgres"
-                                + "?user=" + username
-                                + "&password=" + password;
+        String connectionUrl = "jdbc:postgresql://aws-0-ca-central-1.pooler.supabase.com:6543/postgres"
+            + "?user=" + username
+            + "&password=" + password;
 
         try {
             // create a connection to the database
@@ -71,7 +72,7 @@ public class HockeyDB {
 
     public void repopulate() {
 
-        final int NUM_CHUNKS = 35;
+        final int NUM_CHUNKS = 36;
 
         printBoxedText("Repopulating Database - Estimated Time: 10-30 minutes.");
 

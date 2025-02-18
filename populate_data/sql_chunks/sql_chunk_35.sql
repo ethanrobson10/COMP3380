@@ -1,26 +1,3 @@
-SET NOCOUNT ON;
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030165_259', 8475170, 2018030165, 1003483, 3, 'REGULAR', 832, 'Goal', 'Backhand', 8476945);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030165_261', 8474565, 2018030165, 1003392, 3, 'REGULAR', 850, 'Shot', 'Wrist Shot', 8476945);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030165_276', 8479339, 2018030165, 1003926, 3, 'REGULAR', 1087, 'Shot', 'Wrist Shot', 8476412);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030165_277', 8477940, 2018030165, 1003800, 3, 'REGULAR', 1091, 'Shot', 'Wrist Shot', 8476412);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030165_281', 8475158, 2018030165, 1003463, 3, 'REGULAR', 1139, 'Shot', 'Wrist Shot', 8476945);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030165_287', 8475768, 2018030165, 1003586, 3, 'REGULAR', 1185, 'Goal', 'Deflected', 8476945);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_7', 8476881, 2018030185, 1004539, 1, 'REGULAR', 76, 'Goal', 'Snap Shot', 8470594);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_9', 8476525, 2018030185, 1004476, 1, 'REGULAR', 91, 'Shot', 'Wrist Shot', 8474889);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_19', 8474679, 2018030185, 1004223, 1, 'REGULAR', 210, 'Shot', 'Backhand', 8470594);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_21', 8475191, 2018030185, 1004299, 1, 'REGULAR', 224, 'Shot', 'Wrist Shot', 8474889);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_25', 8474157, 2018030185, 1004173, 1, 'REGULAR', 282, 'Shot', 'Backhand', 8474889);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_29', 8477046, 2018030185, 1004567, 1, 'REGULAR', 343, 'Shot', 'Wrist Shot', 8470594);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_31', 8474053, 2018030185, 1004147, 1, 'REGULAR', 371, 'Shot', 'Backhand', 8470594);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_44', 8475188, 2018030185, 1004276, 1, 'REGULAR', 498, 'Shot', 'Slap Shot', 8474889);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_49', 8476539, 2018030185, 1004504, 1, 'REGULAR', 532, 'Shot', 'Wrist Shot', 8474889);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_58', 8477447, 2018030185, 1004604, 1, 'REGULAR', 566, 'Shot', 'Wrist Shot', 8474889);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_59', 8477931, 2018030185, 1004670, 1, 'REGULAR', 568, 'Shot', 'Wrist Shot', 8474889);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_66', 8474157, 2018030185, 1004175, 1, 'REGULAR', 652, 'Shot', 'Wrist Shot', 8474889);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_68', 8478414, 2018030185, 1004719, 1, 'REGULAR', 658, 'Shot', 'Wrist Shot', 8470594);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_69', 8474053, 2018030185, 1004149, 1, 'REGULAR', 660, 'Goal', 'Wrist Shot', 8470594);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_80', 8477930, 2018030185, 1004656, 1, 'REGULAR', 836, 'Shot', 'Wrist Shot', 8474889);
-INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_86', 8477949, 2018030185, 1004689, 1, 'REGULAR', 923, 'Shot', 'Wrist Shot', 8474889);
 INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_93', 8475169, 2018030185, 1004254, 1, 'REGULAR', 1097, 'Penalty', 'Hi-sticking', NULL);
 INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_96', 8474157, 2018030185, 1004178, 1, 'REGULAR', 1103, 'Shot', 'Wrist Shot', 8474889);
 INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030185_102', 8475191, 2018030185, 1004305, 1, 'REGULAR', 1170, 'Goal', 'Backhand', 8474889);
@@ -3577,8 +3554,6 @@ INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, 
 INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030417_281', 8475158, 2018030417, 1049726, 3, 'REGULAR', 955, 'Shot', 'Snap Shot', 8471695);
 INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030417_285', 8475149, 2018030417, 1049700, 3, 'REGULAR', 1010, 'Shot', 'Wrist Shot', 8476412);
 INSERT INTO plays (playID, playerID, gameID, shiftID, periodNumber, periodType, periodTime, playType, secondaryType, goalieID) VALUES ('2018030417_290', 8476891, 2018030417, 1049951, 3, 'REGULAR', 1070, 'Goal', 'Wrist Shot', 8476412);
-
-PRINT('Table: plays done inserting')
 
 
 INSERT INTO assists (playID, playerID) VALUES ('2016020045_6', 8473573);
@@ -49999,3 +49974,27 @@ INSERT INTO assists (playID, playerID) VALUES ('2013020132_198', 8474586);
 INSERT INTO assists (playID, playerID) VALUES ('2013020132_283', 8476454);
 INSERT INTO assists (playID, playerID) VALUES ('2013020132_283', 8474586);
 INSERT INTO assists (playID, playerID) VALUES ('2013020132_297', 8474102);
+INSERT INTO assists (playID, playerID) VALUES ('2013020132_297', 8476062);
+INSERT INTO assists (playID, playerID) VALUES ('2013020132_337', 8469521);
+INSERT INTO assists (playID, playerID) VALUES ('2013020132_337', 8474056);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_54', 8469466);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_54', 8466333);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_66', 8466140);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_66', 8471682);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_99', 8474586);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_99', 8474602);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_169', 8470834);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_169', 8473412);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_218', 8475791);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_218', 8476454);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_262', 8476855);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_262', 8474102);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_282', 8476454);
+INSERT INTO assists (playID, playerID) VALUES ('2013020564_314', 8475791);
+INSERT INTO assists (playID, playerID) VALUES ('2013020923_16', 8475726);
+INSERT INTO assists (playID, playerID) VALUES ('2013020923_16', 8468508);
+INSERT INTO assists (playID, playerID) VALUES ('2013020923_82', 8474157);
+INSERT INTO assists (playID, playerID) VALUES ('2013020923_82', 8471976);
+INSERT INTO assists (playID, playerID) VALUES ('2013020923_133', 8471685);
+INSERT INTO assists (playID, playerID) VALUES ('2013020923_133', 8474166);
+INSERT INTO assists (playID, playerID) VALUES ('2013020227_80', 8469544);

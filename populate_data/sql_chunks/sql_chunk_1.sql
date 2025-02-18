@@ -1,9 +1,4 @@
-SET NOCOUNT ON;
 
-
-USE cs3380;
-
-SET NOCOUNT ON;
 
 DROP TABLE IF EXISTS assists;
 DROP TABLE IF EXISTS plays;
@@ -29,13 +24,13 @@ CREATE TABLE venues (
   teamID INT,
 
   FOREIGN KEY (teamID) REFERENCES teams (teamID)
-    ON DELETE NO ACTION,
+    ON DELETE NO ACTION
 );
 
 CREATE TABLE games (
   gameID INT PRIMARY KEY,
   type varchar(10) NOT NULL,
-  dateTime DATETIME NOT NULL,
+  dateTime TIMESTAMP NOT NULL,
   outcome varchar(30) NOT NULL,
   season varchar(15) NOT NULL,
   homeTeamID INT,
@@ -189,8 +184,6 @@ INSERT INTO teams (teamID, city, teamName) VALUES (54, 'Vegas', 'Golden Knights'
 INSERT INTO teams (teamID, city, teamName) VALUES (12, 'Carolina', 'Hurricanes');
 INSERT INTO teams (teamID, city, teamName) VALUES (53, 'Arizona', 'Coyotes');
 
-PRINT('Table: teams done inserting')
-
 
 INSERT INTO venues (venueName, teamID, venueID) VALUES ('United Center', 16, 1);
 INSERT INTO venues (venueName, teamID, venueID) VALUES ('KeyBank Center', 7, 2);
@@ -307,8 +300,6 @@ INSERT INTO venues (venueName, teamID, venueID) VALUES ('Scandinavium', 1, 113);
 INSERT INTO venues (venueName, teamID, venueID) VALUES ('Hartwall Arena', 13, 114);
 INSERT INTO venues (venueName, teamID, venueID) VALUES ('Notre Dame Stadium', 16, 115);
 INSERT INTO venues (venueName, teamID, venueID) VALUES ('Lincoln Financial Field', 4, 116);
-
-PRINT('Table: venues done inserting')
 
 
 INSERT INTO games (gameID, type, dateTime, outcome, season, homeTeamID, awayTeamID, venueID) VALUES (2016020045, 'R', '2016-10-19 00:30:00', 'home win REG', '2016-2017', 16, 4, 1);
@@ -10337,8 +10328,6 @@ INSERT INTO games (gameID, type, dateTime, outcome, season, homeTeamID, awayTeam
 INSERT INTO games (gameID, type, dateTime, outcome, season, homeTeamID, awayTeamID, venueID) VALUES (2018030416, 'P', '2019-06-10 00:00:00', 'away win REG', '2018-2019', 19, 6, 108);
 INSERT INTO games (gameID, type, dateTime, outcome, season, homeTeamID, awayTeamID, venueID) VALUES (2018030417, 'P', '2019-06-13 00:00:00', 'away win REG', '2018-2019', 6, 19, 28);
 
-PRINT('Table: games done inserting')
-
 
 INSERT INTO players (playerID, firstName, lastName, nationality, birthDate, height, weight, playerType) VALUES (8466148, 'Marian', 'Hossa', 'SVK', '1979-01-12 00:00:00', '6'' 1"', 207, 'Skater');
 INSERT INTO players (playerID, firstName, lastName, nationality, birthDate, height, weight, playerType) VALUES (8465058, 'Michal', 'Rozsival', 'CZE', '1978-09-03 01:00:00', '6'' 1"', 210, 'Skater');
@@ -12373,8 +12362,6 @@ INSERT INTO players (playerID, firstName, lastName, nationality, birthDate, heig
 INSERT INTO players (playerID, firstName, lastName, nationality, birthDate, height, weight, playerType) VALUES (8477865, 'Jake', 'Chelios', 'USA', '1991-03-08 00:00:00', '6'' 2"', 185, 'Skater');
 INSERT INTO players (playerID, firstName, lastName, nationality, birthDate, height, weight, playerType) VALUES (8478916, 'Joey', 'Daccord', 'USA', '1996-08-19 01:00:00', '6'' 2"', 197, 'Goalie');
 INSERT INTO players (playerID, firstName, lastName, nationality, birthDate, height, weight, playerType) VALUES (8480363, 'Kaden', 'Fulcher', 'CAN', '1998-09-23 01:00:00', '6'' 2"', 182, 'Goalie');
-
-PRINT('Table: players done inserting')
 
 
 INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2012020001, 8459670, 1, NULL);
@@ -49999,3 +49986,15 @@ INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (201302
 INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020180, 8474605, -1, NULL);
 INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020180, 8474683, -1, NULL);
 INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020180, 8475174, -1, NULL);
+INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020180, 8475181, 0, NULL);
+INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020180, 8475204, -1, NULL);
+INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020180, 8475214, 1, NULL);
+INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020180, 8475323, -1, NULL);
+INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020180, 8475650, -1, NULL);
+INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020180, 8476195, 0, NULL);
+INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020180, 8476381, 1, NULL);
+INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020180, 8476438, -1, NULL);
+INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020180, 8476459, -1, NULL);
+INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020181, 8466140, -2, NULL);
+INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020181, 8466160, 1, NULL);
+INSERT INTO playsIn (gameID, playerID, plusMinus, savePercentage) VALUES (2013020181, 8467890, 1, NULL);
